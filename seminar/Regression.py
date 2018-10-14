@@ -10,16 +10,17 @@ paths = defaultdict(list)
 
 for x in range(1,len(data)):
     points = DataHandler.pointsListConverter(data[x][8])
-    key = DataHandler.generateKey(points[0],points[-1],2)
-    paths[key].append(points)
+    if len(points)>4:
+        key = DataHandler.generateKey(points[0],points[1],2)
+        paths[key].append(points)
 
-query = "-8.61,41.15,-8.63,41.15"
+query = "-8.61,41.15,-8.61,41.15"
 
 # pass all paths and generate big array of float points
 allPoints = numpy.concatenate(paths[query])
 latitudes = []
 longitudes = []
-for point in allPoints:
+for point in allPoints[:-1]:
     point = point.split(", ")
     latitudes.append(float(point[0]))
     longitudes.append(float(point[1]))
@@ -31,4 +32,6 @@ longDf = pd.DataFrame(numpy.array(longitudes), columns=['longitudes'])
 reg = linear_model.LinearRegression()
 reg.fit(latDf,longDf)
 predictions = reg.predict(latDf)
-print(predictions)
+for i in range(len(predictions)):
+    if i % 2000 == 0:
+        print(str(predictions[i][0])+","+str(latDf["latitudes"][i]))

@@ -15,7 +15,7 @@ def loadCsv(filename):
 	"""
 		Returns a dataset from a csv file
 	"""
-	lines = csv.reader(open(filename, "rb"))
+	lines = csv.reader(open(filename,"rt", encoding="utf8"))
 	dataset = list(lines)
 	for i in range(len(dataset)):
 		dataset[i] = [parse(x) for x in dataset[i]]
