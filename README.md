@@ -6,3 +6,4 @@ Copy everything else from the paper.
 OPTIONAL:
 
 Color the routes depending on a probability user takes them.
+Training data should first look for users moving data, but if none is found, then general data.

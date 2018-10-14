@@ -27,13 +27,15 @@ def pointsListConverter(raw):
 	points = raw.split("], [")
 	return points
 
-def generateKey(start,end,precision):
-	if(start == "" or end == ""):
-		return ""
-	start = start.split(", ")
-	end = end.split(", ")
-	latstart = round(float(start[0]),precision)
-	longstart = round(float(start[1]),precision)
-	latend = round(float(end[0]),precision)
-	longend = round(float(end[1]),precision)
-	return str(latstart)+","+str(longstart)+","+str(latend)+","+str(longend)
+def generateKey(points,precision):
+	"""
+		Generates a key of a start using a list of points
+	"""
+	key = ""
+	for point in points:
+		coors = point.split(", ")
+		lat = round(float(coors[0]),precision)
+		long = round(float(coors[1]),precision)
+		key += str(long)+","+str(lat)+","
+	# when returning, remove the last comma since it is too much
+	return key[:-1]
