@@ -2,6 +2,7 @@ import DataHandler
 import numpy
 import pandas as pd
 from collections import defaultdict
+from datetime import datetime
 from sklearn import linear_model
 
 data = DataHandler.loadCsv("../data/Porto_taxi_data_training.csv")
@@ -14,6 +15,7 @@ min_length = int(len(query.split(","))/2)
 
 for x in range(1,len(data)):
     points = DataHandler.pointsListConverter(data[x][8])
+    date_timestamp = datetime.utcfromtimestamp(data[x][5]).strftime('%Y-%m-%d %H:%M:%S')
     if len(points)>min_length:
         key = DataHandler.generateKey(points[:min_length],2)
         paths[key].append(points)
@@ -22,7 +24,7 @@ for x in range(1,len(data)):
 try:
     allPoints = numpy.concatenate(paths[query])
 except:
-	print("no paths found")
+    print("no paths found")
 latitudes = []
 longitudes = []
 for point in allPoints[:-1]:
