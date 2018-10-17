@@ -4,6 +4,7 @@ import pandas as pd
 from collections import defaultdict
 from datetime import datetime
 from sklearn import linear_model
+from sklearn.preprocessing import PolynomialFeatures
 
 data = DataHandler.loadCsv("../data/Porto_taxi_data_training.csv")
 # 0th row has only column names
@@ -37,8 +38,13 @@ longDf = pd.DataFrame(numpy.array(longitudes), columns=['longitudes'])
 
 # learn how to do regression
 reg = linear_model.LinearRegression()
-reg.fit(latDf,longDf)
-predictions = reg.predict(latDf)
+
+# pass the order of your polynomial here  
+poly = PolynomialFeatures(6)
+transform = poly.fit_transform(latDf)
+
+reg.fit(transform,longDf)
+predictions = reg.predict(transform)
 for i in range(len(predictions)):
     if i % 2000 == 0:
         print(str(predictions[i][0])+","+str(latDf["latitudes"][i]))
