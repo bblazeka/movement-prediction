@@ -30,5 +30,8 @@
     "weak-key": "^1.0.1",
     "webpack": "^4.21.0",
     "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "google-map-react": "^1.0.9"
   }
 }
