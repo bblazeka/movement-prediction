@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'points', # added points app
-    'rest_framework' # enable rest framework
+    'rest_framework', # enable rest framework
+    'frontend' # enable the frontend app
 ]
 
 MIDDLEWARE = [
