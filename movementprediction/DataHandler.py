@@ -3,6 +3,9 @@ import csv
 import math
 
 def parse(data):
+	"""
+		Used to avoid having integers represented as strings
+	"""
 	try:
 		return int(data)
 	except ValueError:
@@ -16,15 +19,17 @@ def loadCsv(filename):
 		Returns a dataset from a csv file
 	"""
 	lines = csv.reader(open(filename,"rt", encoding="utf8"))
-	dataset = list(lines)
-	for i in range(len(dataset)):
-		dataset[i] = [parse(x) for x in dataset[i]]
+	i = 0
+	dataset = list()
+	while(next(lines) and i < 100000):
+		dataset.append(next(lines))
+		i+=1
 	return dataset
 
 def pointsListConverter(raw):
 	raw = raw[2:]
 	raw = raw[:-2]
-	points = raw.split("], [")
+	points = raw.split("],[")
 	return points
 
 def generateKey(points,precision):
@@ -33,9 +38,9 @@ def generateKey(points,precision):
 	"""
 	key = ""
 	for point in points:
-		coors = point.split(", ")
+		coors = point.split(",")
 		lat = round(float(coors[0]),precision)
 		long = round(float(coors[1]),precision)
 		key += str(long)+","+str(lat)+","
-	# when returning, remove the last comma since it is too much
+	# when returning the key, remove the last comma since it is too much
 	return key[:-1]

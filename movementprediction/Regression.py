@@ -1,23 +1,25 @@
 import DataHandler
 import numpy
+import json
 import pandas as pd
 from collections import defaultdict
 from datetime import datetime
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
 
-data = DataHandler.loadCsv("../data/Porto_taxi_data_training.csv")
+data = DataHandler.loadCsv("../data/train.csv")
 # 0th row has only column names
 paths = defaultdict(list)
 
 query = "41.15,-8.61,41.15,-8.61,41.15,-8.61"
+daytype = "A"
+# A for normal day, B for holiday, C for day before holiday
 # depending on the length of a query, set minimum length
 min_length = int(len(query.split(","))/2)
 
 for x in range(1,len(data)):
     points = DataHandler.pointsListConverter(data[x][8])
-    date_timestamp = datetime.utcfromtimestamp(data[x][5]).strftime('%Y-%m-%d %H:%M:%S')
-    if len(points)>min_length:
+    if data[x][6]==daytype and len(points)>min_length:
         key = DataHandler.generateKey(points[:min_length],2)
         paths[key].append(points)
 
@@ -29,7 +31,7 @@ except:
 latitudes = []
 longitudes = []
 for point in allPoints[:-1]:
-    point = point.split(", ")
+    point = point.split(",")
     latitudes.append(float(point[0]))
     longitudes.append(float(point[1]))
 # store everything in a dataframe
@@ -45,6 +47,17 @@ transform = poly.fit_transform(latDf)
 
 reg.fit(transform,longDf)
 predictions = reg.predict(transform)
+predicted_path = []
 for i in range(len(predictions)):
     if i % 2000 == 0:
-        print(str(predictions[i][0])+","+str(latDf["latitudes"][i]))
+        predicted_path.append({  
+            "model":"points.point",
+            "pk":i,
+            "fields":{  
+                "lat":predictions[i][0],
+                "long":latDf["latitudes"][i]
+            }
+        })
+
+with open('points.json', 'w') as outfile:
+    json.dump(predicted_path,outfile)
