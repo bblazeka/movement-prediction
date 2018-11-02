@@ -41,7 +41,7 @@ def regress(query,daytype):
     reg = linear_model.LinearRegression()
 
     # pass the order of your polynomial here  
-    poly = PolynomialFeatures(8)
+    poly = PolynomialFeatures(12)
     transform = poly.fit_transform(latDf)
 
     reg.fit(transform,longDf)
@@ -54,8 +54,6 @@ def regress(query,daytype):
                     "long":latDf["latitudes"][i]
             })
 
-    #with open('points.json', 'w') as outfile:
-    #    json.dump(predicted_path,outfile)
     return predicted_path
 
 def main():
