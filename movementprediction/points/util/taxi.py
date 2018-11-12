@@ -14,14 +14,14 @@ def parse(data):
 		except ValueError:
 			return data
 
-def loadCsv(filename):
+def loadCsv():
 	"""
 		Returns a dataset from a csv file
 	"""
-	lines = csv.reader(open(filename,"rt", encoding="utf8"))
+	lines = csv.reader(open("../data/train.csv","rt", encoding="utf8"))
 	i = 0
 	dataset = list()
-	while(next(lines) and i < 100000):
+	while(next(lines) and i < 200000):
 		dataset.append(next(lines))
 		i+=1
 	return dataset

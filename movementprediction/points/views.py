@@ -4,5 +4,5 @@ from rest_framework import generics
 from . import regression
 
 class PointListCreate(generics.ListCreateAPIView):
-    queryset = regression.regress("41.15,-8.61,41.15,-8.61,41.15,-8.61","A")
+    queryset = regression.regress("41.148,-8.585,41.148,-8.585,41.148,-8.585,41.148,-8.585","A")
     serializer_class = PointSerializer

@@ -1,14 +1,16 @@
-import DataHandler
 import numpy
+import sys, os
 import json
 import pandas as pd
 from collections import defaultdict
 from datetime import datetime
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
+sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
+import taxi
 
 def regress(query,daytype):
-    data = DataHandler.loadCsv("../data/train.csv")
+    data = taxi.loadCsv()
     # 0th row has only column names
     paths = defaultdict(list)
 
@@ -17,9 +19,9 @@ def regress(query,daytype):
     min_length = int(len(query.split(","))/2)
 
     for x in range(1,len(data)):
-        points = DataHandler.pointsListConverter(data[x][8])
+        points = taxi.pointsListConverter(data[x][8])
         if data[x][6]==daytype and len(points)>min_length:
-            key = DataHandler.generateKey(points[:min_length],2)
+            key = taxi.generateKey(points[:min_length],3)
             paths[key].append(points)
 
     # pass all paths and generate big array of float points
@@ -48,16 +50,15 @@ def regress(query,daytype):
     predictions = reg.predict(transform)
     predicted_path = []
     for i in range(len(predictions)):
-        if i % 5000 == 0:
-            predicted_path.append({
+        predicted_path.append({
                     "lat":predictions[i][0],
                     "long":latDf["latitudes"][i]
-            })
+        })
 
     return predicted_path
 
 def main():
-    print(regress("41.15,-8.61,41.15,-8.61,41.15,-8.61","A"))
+    print(regress("41.148,-8.585,41.148,-8.585,41.148,-8.585,41.148,-8.585","A"))
 
 if __name__ == '__main__':
     main()
