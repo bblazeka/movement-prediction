@@ -9,6 +9,7 @@ djangorestframework = "*"
 pylint = "*"
 pandas = "*"
 sklearn = "*"
+mapbox = "*"
 
 [dev-packages]
 

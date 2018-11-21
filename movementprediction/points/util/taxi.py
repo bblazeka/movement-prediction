@@ -2,6 +2,8 @@ import pandas as pd
 import csv
 import math
 
+folder = "../data/train.csv"
+
 def parse(data):
 	"""
 		Used to avoid having integers represented as strings
@@ -18,10 +20,10 @@ def loadCsv():
 	"""
 		Returns a dataset from a csv file
 	"""
-	lines = csv.reader(open("../data/train.csv","rt", encoding="utf8"))
+	lines = csv.reader(open(folder,"rt", encoding="utf8"))
 	i = 0
 	dataset = list()
-	while(next(lines) and i < 200000):
+	while(next(lines) and i < 500000):
 		dataset.append(next(lines))
 		i+=1
 	return dataset
