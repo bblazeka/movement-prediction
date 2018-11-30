@@ -10,6 +10,7 @@ pylint = "*"
 pandas = "*"
 sklearn = "*"
 mapbox = "*"
+mdanalysis = "*"
 
 [dev-packages]
 
