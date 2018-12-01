@@ -4,7 +4,9 @@ import math
 from MDAnalysis.analysis.psa import hausdorff
 import numpy
 
-folder = "../data/train.csv"
+folder = "../data/PortoTaxi/train.csv"
+distances = "../../../data/PortoTaxi/distances.csv"
+groups = "../../../data/PortoTaxi/groups.csv"
 
 def parse(data):
     """
@@ -74,18 +76,26 @@ def generate():
     for x in range(1,len(data)):
         trajectories[x] = ndarrayConverter(pointsListConverter(data[x][8]))
 
-    for x in range(1,len(data)):
-        points = trajectories[x]
-        for y in range(1,len(data)):
-            if x == y:
-                continue
-            other_trajectory = trajectories[y]
-            try:
-                distance = hausdorff(points,other_trajectory)
-                if distance > 1:
-                    print(distance)
-            except:
-                print("NAN")
+    # grouping threshold set to < 0.2
+    with open(distances, 'w', newline='') as csvfile, open(groups, 'w', newline='') as csvgroups:
+        output_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        groups_writer = csv.writer(csvgroups, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for x in range(1,len(data)):
+            points = trajectories[x]
+            neighbours = []
+            for y in range(1,len(data)):
+                if x == y:
+                    continue
+                other_trajectory = trajectories[y]
+                try:
+                    distance = hausdorff(points,other_trajectory)
+                    output_writer.writerow([x,y,distance])
+                    if distance < 0.05:
+                        neighbours.append(y)
+                except:
+                    output_writer.writerow([x,y,'nan'])
+            groups_writer.writerow([x,neighbours])
+
 
 if __name__ == '__main__':
     generate()

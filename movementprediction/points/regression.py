@@ -58,7 +58,7 @@ def regress(query,daytype="A",precision=12):
         predicted_path.append([latDf["latitudes"][i],predictions[i][0]])
     sorted_path = sorted(predicted_path, key=lambda k: [k[1], k[0]])
 
-    sorted_path = roads_matching(sorted_path)
+    #sorted_path = roads_matching(sorted_path)
 
     for coordinate in sorted_path:
             ending_path.append({
