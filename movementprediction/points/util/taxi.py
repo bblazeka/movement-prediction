@@ -4,7 +4,7 @@ import math
 from MDAnalysis.analysis.psa import hausdorff
 import numpy
 
-folder = "../data/PortoTaxi/train.csv"
+folder = "../../../data/PortoTaxi/train.csv"
 distances = "../../../data/PortoTaxi/distances.csv"
 groups = "../../../data/PortoTaxi/groups.csv"
 
@@ -27,7 +27,7 @@ def loadCsv():
     lines = csv.reader(open(folder,"rt", encoding="utf8"))
     i = 0
     dataset = list()
-    while(next(lines) and i < 500000):
+    while(next(lines) and i < 10000):
         dataset.append(next(lines))
         i+=1
     return dataset
@@ -76,24 +76,31 @@ def generate():
     for x in range(1,len(data)):
         trajectories[x] = ndarrayConverter(pointsListConverter(data[x][8]))
 
-    # grouping threshold set to < 0.2
+    # grouping
     with open(distances, 'w', newline='') as csvfile, open(groups, 'w', newline='') as csvgroups:
         output_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         groups_writer = csv.writer(csvgroups, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        distances_dict = dict()
         for x in range(1,len(data)):
             points = trajectories[x]
             neighbours = []
             for y in range(1,len(data)):
                 if x == y:
                     continue
-                other_trajectory = trajectories[y]
                 try:
-                    distance = hausdorff(points,other_trajectory)
-                    output_writer.writerow([x,y,distance])
-                    if distance < 0.05:
-                        neighbours.append(y)
+                    # check if already calculated in opposite order
+                    distance = distances_dict[(y,x)]
                 except:
-                    output_writer.writerow([x,y,'nan'])
+                    other_trajectory = trajectories[y]
+                    try:
+                        distance = hausdorff(points,other_trajectory)
+                        distances_dict[(x,y)] = distance
+                    except:
+                        output_writer.writerow([x,y,'nan'])
+                # grouping threshold
+                if distance < 0.05:
+                        neighbours.append(y)
+                output_writer.writerow([x,y,distance])                        
             groups_writer.writerow([x,neighbours])
 
 
