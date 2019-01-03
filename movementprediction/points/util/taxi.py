@@ -4,9 +4,9 @@ import math
 from MDAnalysis.analysis.psa import hausdorff
 import numpy
 
-folder = "../../../data/PortoTaxi/train.csv"
-distances = "../../../data/PortoTaxi/distances.csv"
-groups = "../../../data/PortoTaxi/groups.csv"
+folder = "../data/PortoTaxi/train.csv"
+distances = "../data/PortoTaxi/distances.csv"
+groups = "../data/PortoTaxi/groups.csv"
 
 def parse(data):
     """
@@ -27,7 +27,7 @@ def loadCsv():
     lines = csv.reader(open(folder,"rt", encoding="utf8"))
     i = 0
     dataset = list()
-    while(next(lines) and i < 10000):
+    while(next(lines) and i < 1000):
         dataset.append(next(lines))
         i+=1
     return dataset
@@ -52,18 +52,40 @@ def ndarrayConverter(data):
     return numpy.array(ndarraylist)
 
 
-def generateKey(points,precision):
+def containing(points,query,precision=0.001):
     """
-        Generates a key of a start using a list of points
+        Check if query is contained within given points array
     """
-    key = ""
+    trim_factor = len(query)+1
+    for i in range(len(points)-trim_factor):
+        for j in range(len(query)):
+            if abs(points[j+i][0]-query[j][0])>precision or abs(points[i+j][1]-query[j][1])>precision:
+                break
+            return True
+    return False
+
+def starting(points,query,precision=0.001):
+    """
+        Check if query is the start of points array
+    """
+    for i in range(len(query)):
+        if abs(points[i][0]-query[i][0])>precision or abs(points[i][1]-query[i][1])>precision:
+            break
+        return True
+    return False
+
+def convertPoints(points):
+    """
+        Converts an array from string to float coordinates
+    """
+    geo_points = []
     for point in points:
         coors = point.split(",")
-        lat = round(float(coors[0]),precision)
-        long = round(float(coors[1]),precision)
-        key += str(long)+","+str(lat)+","
-    # when returning the key, remove the last comma since it is too much
-    return key[:-1]
+        lat = float(coors[0])
+        long = float(coors[1])
+        geo_points.append([lat,long])
+    return geo_points
+
 
 def generate():
     """

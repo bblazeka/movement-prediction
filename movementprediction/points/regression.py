@@ -11,32 +11,33 @@ from datetime import datetime, timedelta
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 
-def regress(query,daytype="A",precision=12):
+def regress(query,daytype="A",precision=8):
     data = taxi.loadCsv()
     # 0th row has only column names
-    paths = defaultdict(list)
+    paths = list()
 
     # A for normal day, B for holiday, C for day before holiday
     # depending on the length of a query, set minimum length
-    min_length = int(len(query.split(","))/2)
+    min_length = len(query)/2
 
     for x in range(1,len(data)):
         points = taxi.pointsListConverter(data[x][8])
         if data[x][6]==daytype and len(points)>min_length:
-            key = taxi.generateKey(points[:min_length],3)
-            paths[key].append(points)
+            # convert data to array of tuples of float values
+            geopoints = taxi.convertPoints(points)
+            if taxi.containing(geopoints,query):
+                paths.append(geopoints)
 
     # pass all paths and generate big array of float points
     try:
-        allPoints = numpy.concatenate(paths[query])
+        allPoints = numpy.concatenate(paths)
     except:
         print("no paths found")
     latitudes = []
     longitudes = []
     for point in allPoints[:-1]:
-        point = point.split(",")
-        latitudes.append(float(point[0]))
-        longitudes.append(float(point[1]))
+        latitudes.append(point[0])
+        longitudes.append(point[1])
     # store everything in a dataframe
     latDf = pd.DataFrame(numpy.array(latitudes), columns=['latitudes'])
     longDf = pd.DataFrame(numpy.array(longitudes), columns=['longitudes'])
@@ -108,6 +109,7 @@ def roads_matching(sorted_path):
     return return_path
 
 def main():
+    # not used in this application
     print(regress("41.148,-8.585,41.148,-8.585,41.148,-8.585,41.148,-8.585","A"))
 
 if __name__ == '__main__':
