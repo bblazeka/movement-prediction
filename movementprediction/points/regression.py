@@ -12,7 +12,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 
 def regress(query,daytype="A",precision=8):
-    data = taxi.loadCsv()
+    data = taxi.loadRelated(4)
     # 0th row has only column names
     paths = list()
 

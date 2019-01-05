@@ -27,9 +27,33 @@ def loadCsv():
     lines = csv.reader(open(folder,"rt", encoding="utf8"))
     i = 0
     dataset = list()
-    while(next(lines) and i < 1000):
-        dataset.append(next(lines))
+    for line in lines:
+        dataset.append(line)
         i+=1
+        if(i>1000):
+            break
+    return dataset
+
+def loadRelated(id):
+    """
+        Returns a dataset of trajectories that are from the same user
+    """
+    similar_routes = csv.reader(open(groups,"rt", encoding="utf8"))
+    lines = csv.reader(open(folder,"rt", encoding="utf8"))
+    dataset = list()
+    filtered = list()
+    for line in similar_routes:
+        if int(line[0]) == id:
+            filtered = [int(x) for x in line[1][1:-1].split(", ")]
+            break
+    i=0
+    last_element = filtered[-1]
+    for line in lines:
+        i+=1
+        if i in filtered:
+            dataset.append(line)
+        if i > last_element:
+            break
     return dataset
 
 def pointsListConverter(raw):
