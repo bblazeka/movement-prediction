@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'points', # added points app
     'rest_framework', # enable rest framework
-    'frontend' # enable the frontend app
 ]
 
 MIDDLEWARE = [
