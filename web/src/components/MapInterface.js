@@ -13,7 +13,6 @@ export default class MapInterface extends React.Component {
     }
 
     componentDidMount() {
-
         const map = new mapboxgl.Map({
             container: this.mapContainer,
             style: 'mapbox://styles/mapbox/streets-v9',
@@ -23,7 +22,7 @@ export default class MapInterface extends React.Component {
         map.addControl(new mapboxgl.NavigationControl());
         let trajectory = {
                  "type": "FeatureCollection",
-                "features": this.props.data.map(function(v) {
+                "features": this.props.data.data.map(function(v) {
                return {
                       "type": "Feature",
                        "geometry": {
@@ -33,12 +32,28 @@ export default class MapInterface extends React.Component {
                    };
                  })
              };
+        let extended = {
+            "type": "FeatureCollection",
+            "features": this.props.data.allRoutes.map(function(v) {
+           return {
+                  "type": "Feature",
+                   "geometry": {
+                       "type": "Point",
+                        "coordinates": [v.long, v.lat]
+                   }
+               };
+             })
+        }
         map.on('load', function () {
-             map.addSource('trajectory', {
-             type: 'geojson',
-             data: trajectory
+            map.addSource('trajectory', {
+                type: 'geojson',
+                data: trajectory
             });
-             map.addLayer({
+            map.addSource('extended', {
+                type: 'geojson',
+                data: extended
+            });
+            map.addLayer({
                  'id': 'trajectory-layer',
                 'type': 'circle',
                  'source': 'trajectory',
@@ -48,8 +63,20 @@ export default class MapInterface extends React.Component {
                  'paint': {
                  'circle-radius': 2,
                   'circle-color': 'rgba(55,148,179,1)'
-             }
-         });
+                 }
+            });
+            map.addLayer({
+                'id': 'extended-layer',
+               'type': 'circle',
+                'source': 'extended',
+               'layout': {
+                    'visibility': 'visible'
+                },
+                'paint': {
+                'circle-radius': 2,
+                 'circle-color': 'rgba(128,0,0,1)'
+                }
+            });
         });
         map.resize();
     }

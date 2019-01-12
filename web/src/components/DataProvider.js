@@ -7,6 +7,7 @@ class DataProvider extends Component {
   };
   state = {
       data: [],
+      allRoutes: [],
       loaded: false,
       placeholder: "Loading..."
     };
@@ -20,10 +21,20 @@ class DataProvider extends Component {
         return response.json();
       })
       .then(data => this.setState({ data: data, loaded: true }));
+    fetch(this.props.endpoint+"all/")
+      .then(response => {
+        console.log(response)
+        if (response.status !== 200) {
+          return this.setState({ placeholder: "Something went wrong" });
+        }
+        return response.json();
+      })
+      .then(data => this.setState({ allRoutes: data, loaded: true }));
   }
   render() {
-    const { data, loaded, placeholder } = this.state;
-    return loaded ? this.props.render(data) : <p>{placeholder}</p>;
+    const { allRoutes, data, loaded, placeholder } = this.state;
+    const ready = allRoutes.length>0 && data.length>0;
+    return loaded && ready ? this.props.render({allRoutes,data}) : <p>{placeholder}</p>;
   }
 }
 export default DataProvider;

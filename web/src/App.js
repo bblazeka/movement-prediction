@@ -8,7 +8,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <DataProvider endpoint="http://localhost:8000/api/point/" 
+        <DataProvider endpoint="http://localhost:8000/api/path/" 
                 render={data => <MapInterface data={data} />} />
       </div>
     );

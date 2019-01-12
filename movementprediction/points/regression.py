@@ -11,8 +11,11 @@ from datetime import datetime, timedelta
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 
-def regress(query,daytype="A",precision=8):
-    data = taxi.loadRelated(4)
+def regress(query,user=0,daytype="A",precision=8):
+    if user == 0:
+        data = taxi.loadCsv()
+    else:
+        data = taxi.loadRelated(user)
     # 0th row has only column names
     paths = list()
 
