@@ -12,10 +12,17 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 
 def regress(query,user=0,daytype="A",precision=8):
+    
+    # check if input is a string, parse to an array
+    if type(query) is str:
+        query = taxi.parseCoordinatesArray(query)
+    
+    # load data
     if user == 0:
         data = taxi.loadCsv()
     else:
         data = taxi.loadRelated(user)
+    
     # 0th row has only column names
     paths = list()
 

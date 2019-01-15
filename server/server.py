@@ -10,7 +10,9 @@ CORS(app)
 def hello():
     return 'Hello, World!'
 
-@app.route('/api/path/<path>', methods=['GET', 'POST'])
-def path(path):
-    predict = regression.regress([[-8.585,41.148],[-8.585,41.148],[-8.585,41.148],[-8.585,41.148]],user=int(path))
+@app.route('/api/path', methods=['GET', 'POST'])
+def path():
+    path = request.args.get('input', '')
+    user = int(request.args.get('user', ''))
+    predict = regression.regress(path,user=user)
     return jsonify(predict)

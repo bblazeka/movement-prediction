@@ -98,6 +98,15 @@ def starting(points,query,precision=0.001):
         return True
     return False
 
+def parseCoordinatesArray(array):
+    """
+        Convert array in string representation to an actual array of coordinates
+    """
+    coordinates = []
+    for coor in array[2:-2].split("],["):
+        coordinates.append(coor)
+    return convertPoints(coordinates)
+
 def convertPoints(points):
     """
         Converts an array from string to float coordinates
