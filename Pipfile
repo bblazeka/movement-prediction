@@ -12,6 +12,9 @@ sklearn = "*"
 mapbox = "*"
 mdanalysis = "*"
 django-cors-headers = "*"
+flask = "*"
+virtualenv = "*"
+flask-cors = "*"
 
 [dev-packages]
 

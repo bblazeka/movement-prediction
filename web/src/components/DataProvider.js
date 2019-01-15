@@ -12,7 +12,7 @@ class DataProvider extends Component {
       placeholder: "Loading..."
     };
   componentDidMount() {
-    fetch(this.props.endpoint)
+    fetch(this.props.endpoint+0)
       .then(response => {
         console.log(response)
         if (response.status !== 200) {
@@ -21,7 +21,7 @@ class DataProvider extends Component {
         return response.json();
       })
       .then(data => this.setState({ data: data, loaded: true }));
-    fetch(this.props.endpoint+"all/")
+    fetch(this.props.endpoint+4)
       .then(response => {
         console.log(response)
         if (response.status !== 200) {
