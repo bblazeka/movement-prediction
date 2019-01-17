@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import DataProvider from "./components/DataProvider";
 import MapInterface from "./components/MapInterface";
 import './App.css';
 
@@ -8,8 +7,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <DataProvider endpoint="http://localhost:5000/api/path" 
-                render={data => <MapInterface data={data} />} />
+        <MapInterface />
       </div>
     );
   }
