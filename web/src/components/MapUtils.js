@@ -1,7 +1,15 @@
-export const trajectoryLayer = {
-    'id': 'trajectory-layer',
+export const emptyFeatureCollection = {
+    type: 'geojson',
+    data: {
+        "type": "FeatureCollection",
+        "features": []
+    }
+}
+
+export const individualLayer = {
+    'id': 'individual-layer',
    'type': 'circle',
-    'source': 'trajectory',
+    'source': 'individual',
    'layout': {
         'visibility': 'visible'
     },
@@ -11,10 +19,10 @@ export const trajectoryLayer = {
     }
 }
 
-export const extendedLayer = {
-    'id': 'extended-layer',
+export const generalLayer = {
+    'id': 'general-layer',
    'type': 'circle',
-    'source': 'extended',
+    'source': 'general',
    'layout': {
         'visibility': 'visible'
     },

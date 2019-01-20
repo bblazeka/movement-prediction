@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as appActions from '../actions/appActions';
 
 import './Map.css';
-import { trajectoryLayer, extendedLayer, inputLayer } from './MapUtils';
+import { individualLayer, generalLayer, inputLayer, emptyFeatureCollection } from './MapUtils';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqcWprdnNodzA0aDMzeHMxZndrYnhucDgifQ.jUE6YbihyEe0kvTfbvD6iw';
 
@@ -80,8 +80,8 @@ class MapInterface extends Component {
                    };
                  })
             }
-            map.getSource('trajectory').setData(trajectory);
-            map.getSource('extended').setData(extended);
+            map.getSource('individual').setData(trajectory);
+            map.getSource('general').setData(extended);
         }
     }
 
@@ -94,30 +94,12 @@ class MapInterface extends Component {
         });
         let that = this;
         map.on('load', function () {
-            map.addSource('trajectory', {
-                type: 'geojson',
-                data: {
-                    "type": "FeatureCollection",
-                    "features": []
-                }
-            });
-            map.addSource('extended', {
-                type: 'geojson',
-                data: {
-                    "type": "FeatureCollection",
-                    "features": []
-                }
-            });
-            map.addSource('input', {
-                type: 'geojson',
-                data: {
-                    "type": "FeatureCollection",
-                    "features": []
-                }
-            })
-            map.addLayer(trajectoryLayer);
-            map.addLayer(extendedLayer);
-            map.addLayer(inputLayer)
+            map.addSource('individual', emptyFeatureCollection);
+            map.addSource('general', emptyFeatureCollection);
+            map.addSource('input', emptyFeatureCollection);
+            map.addLayer(individualLayer);
+            map.addLayer(generalLayer);
+            map.addLayer(inputLayer);
             map.resize();
         });
         let path = []
