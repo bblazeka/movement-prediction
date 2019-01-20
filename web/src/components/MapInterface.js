@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import * as appActions from '../actions/appActions';
 
 import './Map.css';
+import { trajectoryLayer, extendedLayer, inputLayer } from './MapUtils';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqcWprdnNodzA0aDMzeHMxZndrYnhucDgifQ.jUE6YbihyEe0kvTfbvD6iw';
 
@@ -15,22 +16,42 @@ class MapInterface extends Component {
         zoom: 12
     }
 
+    request(that,path) {
+        if (that.map) {
+            that.map.getSource('input').setData({
+                "type": "FeatureCollection",
+                "features": path.map(function(v) {
+                    return {
+                           "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                 "coordinates": [v[0], v[1]]
+                            }
+                        };
+                    })
+            })
+        }
+        that.props.getPrediction(4,JSON.stringify(path).replace(/['"]+/g, ''))
+        that.props.getPrediction(0,JSON.stringify(path).replace(/['"]+/g, ''))
+    }
+
     componentDidMount() {
         this.loadMap();
         let i = 0;
         let that = this;
         let path = "[[-8.618643,41.141412],[-8.618499,41.141376],[-8.620326,41.14251],[-8.622153,41.143815],[-8.623953,41.144373],[-8.62668,41.144778],[-8.627373,41.144697],[-8.630226,41.14521],[-8.632746,41.14692],[-8.631738,41.148225],[-8.629938,41.150385],[-8.62911,41.151213],[-8.629128,41.15124],[-8.628786,41.152203],[-8.628687,41.152374],[-8.628759,41.152518],[-8.630838,41.15268],[-8.632323,41.153022],[-8.631144,41.154489],[-8.630829,41.154507],[-8.630829,41.154516],[-8.630829,41.154498],[-8.630838,41.154489]]"
-        window.setInterval(function() {
+        let interval = window.setInterval(function() {
             i++;
             const array = JSON.parse(path)
             const subpath = array.slice(0,i*5);
-            that.props.getPrediction(4,JSON.stringify(subpath).replace(/['"]+/g, ''))
-            that.props.getPrediction(0,JSON.stringify(subpath).replace(/['"]+/g, ''))
+            that.request(that,subpath)
+            if (i > 5) {
+                window.clearInterval(interval)
+            }
         }, 5000);
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log("nextprops",nextProps)
         const map = this.map;
 
         // if both path predictions have loaded
@@ -87,40 +108,26 @@ class MapInterface extends Component {
                     "features": []
                 }
             });
-            map.addLayer({
-                 'id': 'trajectory-layer',
-                'type': 'circle',
-                 'source': 'trajectory',
-                'layout': {
-                     'visibility': 'visible'
-                 },
-                 'paint': {
-                 'circle-radius': 2,
-                  'circle-color': 'rgba(55,148,179,1)'
-                 }
-            });
-            map.addLayer({
-                'id': 'extended-layer',
-               'type': 'circle',
-                'source': 'extended',
-               'layout': {
-                    'visibility': 'visible'
-                },
-                'paint': {
-                'circle-radius': 2,
-                 'circle-color': 'rgba(128,0,0,1)'
+            map.addSource('input', {
+                type: 'geojson',
+                data: {
+                    "type": "FeatureCollection",
+                    "features": []
                 }
-            });
+            })
+            map.addLayer(trajectoryLayer);
+            map.addLayer(extendedLayer);
+            map.addLayer(inputLayer)
             map.resize();
         });
         let path = []
+        that = this
         map.on("click", function(e) {
             let lng = e.lngLat.lng.toFixed(3);
             let lat = e.lngLat.lat.toFixed(3);
             path.push([lng,lat])
             if (path.length > 3) {
-                that.props.getPrediction(4,JSON.stringify(path).replace(/['"]+/g, ''))
-                that.props.getPrediction(0,JSON.stringify(path).replace(/['"]+/g, ''))
+                that.request(that,path)
             }
             console.log(JSON.stringify(path).replace(/['"]+/g, ''))
         })

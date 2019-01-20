@@ -2,6 +2,6 @@
 
 - run pipenv: pipenv shell
 
-- Back-end: Django (run with: `python manage.py runserver`)
+- server: Flask (run with: `FLASK_APP=server.py flask run`)
 
-- Front-end: React.js (run with: `npm start`)
+- client: React.js (run with: `npm start`)

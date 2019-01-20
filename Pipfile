@@ -4,14 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-djangorestframework = "*"
 pylint = "*"
 pandas = "*"
 sklearn = "*"
 mapbox = "*"
 mdanalysis = "*"
-django-cors-headers = "*"
 flask = "*"
 virtualenv = "*"
 flask-cors = "*"
