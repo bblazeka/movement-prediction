@@ -11,7 +11,10 @@ from datetime import datetime, timedelta
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 
-def regress(query,user=0,daytype="A",precision=8):
+def prepare_data(query,user=0,daytype="A"):
+    """
+        Prepares the data for regression
+    """
     
     # check if input is a string, parse to an array
     if type(query) is str:
@@ -43,11 +46,24 @@ def regress(query,user=0,daytype="A",precision=8):
         allPoints = numpy.concatenate(paths)
     except:
         print("no paths found")
+
+    output_points = []
+    for point in allPoints[:-1]:
+        output_points.append({
+            "lat":point[1],
+            "long":point[0]
+        })
+    return allPoints[:-1],query[-1]
+
+def poly_regression(points,precision=8):
+    """
+        Implementation of polynomal regression
+    """
     latitudes = []
     longitudes = []
-    for point in allPoints[:-1]:
+    for point in points[:-1]:
         latitudes.append(point[0])
-        longitudes.append(point[1])
+        longitudes.append(point[1])    
     # store everything in a dataframe
     latDf = pd.DataFrame(numpy.array(latitudes), columns=['latitudes'])
     longDf = pd.DataFrame(numpy.array(longitudes), columns=['longitudes'])
@@ -69,17 +85,27 @@ def regress(query,user=0,daytype="A",precision=8):
         predicted_path.append([latDf["latitudes"][i],predictions[i][0]])
     sorted_path = sorted(predicted_path, key=lambda k: [k[1], k[0]])
 
-    #sorted_path = roads_matching(sorted_path)
+    return sorted_path
 
-    for coordinate in sorted_path:
+def formatting(path,start):
+    """
+        Method used to format output data, remove part of the prediction that was already passed
+    """
+
+    ending_path = []
+    for coordinate in path:
+        if start[0] > coordinate[0]:
             ending_path.append({
-                        "lat":coordinate[1],
-                        "long":coordinate[0]
+                "lat":coordinate[1],
+                "long":coordinate[0]
             })
 
     return ending_path
 
 def roads_matching(sorted_path):
+    """
+        ALPHA VERSION: not sure it works
+    """
     return_path = []
     # api can only take in 100 points at the time
     for _ in range(1):
