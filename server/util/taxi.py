@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import math
 from MDAnalysis.analysis.psa import hausdorff
+from pymongo import MongoClient
 import numpy
 
 folder = "../data/PortoTaxi/train.csv"
@@ -33,6 +34,19 @@ def loadCsv():
         if(i>1000):
             break
     return dataset
+
+def loadMongo():
+    """
+        Read data from mongo database into a dataset
+    """
+    client = MongoClient("127.0.0.1:27017")
+    db=client.movementprediction
+    collection=db['things']
+    cursor=collection.find({})
+    for document in cursor:
+        print(document)
+    # currently, it only prints all documents, it should be converted to returning an array
+    # or csv loader should return json
 
 def loadRelated(id):
     """
@@ -160,4 +174,4 @@ def generate():
 
 
 if __name__ == '__main__':
-    generate()
+    mongo = loadMongo()
