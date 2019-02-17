@@ -14,7 +14,7 @@ def hello():
 def path():
     path = request.args.get('input', '')
     user = int(request.args.get('user', ''))
-    points, startpoint = regression.prepare_data(path,user=user)
+    points, startpoint, direction = regression.prepare_data(path,user=user)
     predict = regression.poly_regression(points)
     formatted = regression.formatting(predict,startpoint)
     return jsonify(formatted)

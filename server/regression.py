@@ -1,4 +1,5 @@
 import numpy
+import math
 import sys, os
 import json
 import pandas as pd
@@ -53,7 +54,9 @@ def prepare_data(query,user=0,daytype="A"):
             "lat":point[1],
             "long":point[0]
         })
-    return allPoints[:-1],query[-1]
+    a = query[-2]
+    b = query[-1]
+    return allPoints[:-1],query[-1],math.atan2(b[0]-a[0],b[1]-a[1])
 
 def poly_regression(points,precision=8):
     """
@@ -91,16 +94,22 @@ def formatting(path,start):
     """
         Method used to format output data, remove part of the prediction that was already passed
     """
-
-    ending_path = []
+    # path manipulation (filtering, road matching and so on)
+    filtered_path = []
     for coordinate in path:
         if start[0] > coordinate[0]:
-            ending_path.append({
+            filtered_path.append(coordinate)
+
+    # formatting to be compatible with the map   
+    formatted_path = []
+    for coordinate in filtered_path:
+        if True:
+            formatted_path.append({
                 "lat":coordinate[1],
                 "long":coordinate[0]
             })
 
-    return ending_path
+    return formatted_path
 
 def roads_matching(sorted_path):
     """
@@ -112,7 +121,7 @@ def roads_matching(sorted_path):
 
         values = []
         prev = datetime(2018,10,10,11,34,59)
-        for _ in range(100):
+        for _ in range(len(sorted_path)):
             min = str('%02d' % prev.minute)
             sec = str('%02d' % prev.second)
             values.append(str(prev.year)+"-"+str(prev.month)+"-"+str(prev.day)+"T"+str(prev.hour)+":"+min+":"+sec+"Z")
@@ -131,16 +140,19 @@ def roads_matching(sorted_path):
         response = service.match(line, profile='mapbox.driving')
         max = 0
         best = 0
-        features = response.geojson()['features']
-        for i in range(len(features)):
-            if len(features[i]['geometry']['coordinates'])>max and features[i]['properties']['confidence'] > 0.1:
-                max = len(features[i]['geometry']['coordinates'])
-                best = i
+        try:
+            features = response.geojson()['features']
+            for i in range(len(features)):
+                if len(features[i]['geometry']['coordinates'])>max and features[i]['properties']['confidence'] > 0.1:
+                    max = len(features[i]['geometry']['coordinates'])
+                    best = i
 
-        corrected = response.geojson()['features'][best]['geometry']['coordinates']
+            corrected = response.geojson()['features'][best]['geometry']['coordinates']
 
-        for corr in corrected:
-            return_path.append(corr)
+            for corr in corrected:
+                return_path.append(corr)
+        except Exception as e:
+            print(e)
 
     return return_path
 
