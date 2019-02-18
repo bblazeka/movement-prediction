@@ -54,9 +54,8 @@ def prepare_data(query,user=0,daytype="A"):
             "lat":point[1],
             "long":point[0]
         })
-    a = query[-2]
-    b = query[-1]
-    return allPoints[:-1],query[-1],math.atan2(b[0]-a[0],b[1]-a[1])
+
+    return allPoints[:-1],query[-10:]
 
 def poly_regression(points,precision=8):
     """
@@ -97,17 +96,32 @@ def formatting(path,start):
     # path manipulation (filtering, road matching and so on)
     filtered_path = []
     for coordinate in path:
-        if start[0] > coordinate[0]:
+        if start[0][0] > coordinate[0]:
+            if(len(filtered_path)==5):
+                a=filtered_path[0]
+                b=filtered_path[4]
             filtered_path.append(coordinate)
+
+    # calculate direction vector
+    deltaX = b[0]-a[0]
+    deltaY = b[1]-a[1]
+    dirX = start[1][0] - start[0][0]
+    dirY = start[1][1] - start[0][1]
+    base_point = start[-1]
+    predicted_path = []
+    for i in range(10):
+        new_point = [base_point[0]+deltaX+dirX,base_point[1]+deltaY+dirY]
+        predicted_path.append(new_point)
+        base_point = new_point
+
 
     # formatting to be compatible with the map   
     formatted_path = []
-    for coordinate in filtered_path:
-        if True:
-            formatted_path.append({
-                "lat":coordinate[1],
-                "long":coordinate[0]
-            })
+    for coordinate in predicted_path:
+        formatted_path.append({
+            "lat":coordinate[1],
+            "long":coordinate[0]
+        })
 
     return formatted_path
 
