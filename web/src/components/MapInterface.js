@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as appActions from '../actions/appActions';
 
 import './Map.css';
-import { individualLayer, generalLayer, inputLayer, emptyFeatureCollection } from './MapUtils';
+import { individualLayer, generalLayer, inputLayer, emptyFeatureCollection, optionalLayer } from './MapUtils';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqcWprdnNodzA0aDMzeHMxZndrYnhucDgifQ.jUE6YbihyEe0kvTfbvD6iw';
 
@@ -13,7 +13,7 @@ class MapInterface extends Component {
 
     static defaultProps = {
         center: { lat: 41.15, lng: -8.61 },
-        zoom: 12
+        zoom: 13
     }
 
     request(that,path) {
@@ -31,7 +31,7 @@ class MapInterface extends Component {
                     })
             })
         }
-        that.props.getPrediction(4,JSON.stringify(path).replace(/['"]+/g, ''))
+        // currently disabled personalized prediction: change 0 and 4
         that.props.getPrediction(0,JSON.stringify(path).replace(/['"]+/g, ''))
     }
 
@@ -51,41 +51,14 @@ class MapInterface extends Component {
             if (i > 5) {
                 window.clearInterval(interval)
             }
-        }, 8000);
+        }, 5000);
     }
 
     componentWillReceiveProps(nextProps) {
         const map = this.map;
-
-        // if both path predictions have loaded
-        if (nextProps.general && nextProps.individual) {
-            let trajectory = {
-                "type": "FeatureCollection",
-               "features": nextProps.general.map(function(v) {
-              return {
-                     "type": "Feature",
-                      "geometry": {
-                          "type": "Point",
-                           "coordinates": [v.long, v.lat]
-                      }
-                  };
-                })
-            };
-            let extended = {
-                "type": "FeatureCollection",
-                "features": nextProps.individual.map(function(v) {
-               return {
-                      "type": "Feature",
-                       "geometry": {
-                           "type": "Point",
-                            "coordinates": [v.long, v.lat]
-                       }
-                   };
-                 })
-            }
-            map.getSource('individual').setData(trajectory);
-            map.getSource('general').setData(extended);
-        }
+        map.getSource('individual').setData(nextProps.general.predicted);
+        map.getSource('general').setData(nextProps.general.direction);
+        map.getSource('optional').setData(nextProps.general.optional);
     }
 
     loadMap() {
@@ -100,9 +73,11 @@ class MapInterface extends Component {
             map.addSource('individual', emptyFeatureCollection);
             map.addSource('general', emptyFeatureCollection);
             map.addSource('input', emptyFeatureCollection);
+            map.addSource('optional', emptyFeatureCollection);
             map.addLayer(individualLayer);
             map.addLayer(generalLayer);
             map.addLayer(inputLayer);
+            map.addLayer(optionalLayer);
             map.resize();
         });
         let path = []

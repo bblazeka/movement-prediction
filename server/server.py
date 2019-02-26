@@ -16,5 +16,5 @@ def path():
     user = int(request.args.get('user', ''))
     points, ending = regression.prepare_data(path,user=user)
     predict = regression.poly_regression(points)
-    formatted = regression.formatting(predict,ending)
+    formatted = regression.formatting(predict,points,ending)
     return jsonify(formatted)

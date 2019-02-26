@@ -89,7 +89,7 @@ def poly_regression(points,precision=8):
 
     return sorted_path
 
-def formatting(path,start):
+def formatting(path,input,start):
     """
         Method used to format output data, remove part of the prediction that was already passed
     """
@@ -97,16 +97,16 @@ def formatting(path,start):
     filtered_path = []
     for coordinate in path:
         if start[0][0] > coordinate[0]:
-            if(len(filtered_path)==5):
+            if(len(filtered_path)==11):
                 a=filtered_path[0]
-                b=filtered_path[4]
+                b=filtered_path[10]
             filtered_path.append(coordinate)
 
     # calculate direction vector
-    deltaX = b[0]-a[0]
-    deltaY = b[1]-a[1]
-    dirX = start[1][0] - start[0][0]
-    dirY = start[1][1] - start[0][1]
+    deltaX = (b[0]-a[0])/2
+    deltaY = (b[1]-a[1])/2
+    dirX = (start[2][0] - start[0][0])/2
+    dirY = (start[2][1] - start[0][1])/2
     base_point = start[-1]
     predicted_path = []
     for i in range(10):
@@ -114,16 +114,12 @@ def formatting(path,start):
         predicted_path.append(new_point)
         base_point = new_point
 
-
-    # formatting to be compatible with the map   
-    formatted_path = []
-    for coordinate in predicted_path:
-        formatted_path.append({
-            "lat":coordinate[1],
-            "long":coordinate[0]
-        })
-
-    return formatted_path
+    return {
+        "input": geojson_path_converter(input),
+        "optional": geojson_path_converter(roads_matching(predicted_path)),
+        "predicted": geojson_path_converter(filtered_path),
+        "direction": geojson_path_converter(predicted_path)
+    }
 
 def roads_matching(sorted_path):
     """
@@ -169,6 +165,24 @@ def roads_matching(sorted_path):
             print(e)
 
     return return_path
+
+def geojson_path_converter(path):
+    """
+        converts list of [latitude,longitude] to geojson point features list
+    """
+    geojson_path = []
+    for coordinate in path:
+        geojson_path.append({
+                "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [coordinate[0], coordinate[1]]
+                    }
+                })
+    return {
+        "type": "FeatureCollection",
+        "features": geojson_path
+    }
 
 def main():
     # not used in this application

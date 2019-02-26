@@ -44,3 +44,16 @@ export const inputLayer = {
      'circle-color': 'rgba(0,100,0,1)'
     }
 }
+
+export const optionalLayer = {
+    'id': 'optional-layer',
+   'type': 'circle',
+    'source': 'optional',
+   'layout': {
+        'visibility': 'visible'
+    },
+    'paint': {
+    'circle-radius': 2,
+     'circle-color': 'rgba(255,0,0,1)'
+    }    
+}
