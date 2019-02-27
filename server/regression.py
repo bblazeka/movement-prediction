@@ -7,10 +7,10 @@ from collections import defaultdict
 from datetime import datetime
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
-from mapbox import MapMatcher
 from datetime import datetime, timedelta
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
+import geoutil
 
 def prepare_data(query,user=0,daytype="A"):
     """
@@ -55,7 +55,19 @@ def prepare_data(query,user=0,daytype="A"):
             "long":point[0]
         })
 
-    return allPoints[:-1],query[-10:]
+    return allPoints[:-1],query
+
+def linear_regression(points):
+    """
+        calculates linear regression over a set of points [latitude,longitude]
+    """
+    latitudes = [[i[0]] for i in points]
+    longitudes = [[i[1]] for i in points]
+
+    # regression logic
+    regr = linear_model.LinearRegression()
+    regr.fit(latitudes,longitudes)
+    return [[x[0],y[0]] for x,y in zip(latitudes,regr.predict(latitudes))]
 
 def poly_regression(points,precision=8):
     """
@@ -75,39 +87,68 @@ def poly_regression(points,precision=8):
 
     # pass the order of your polynomial here  
     poly = PolynomialFeatures(precision)
+
+    
+    # north-south regression
+    vertical_predicted_path = []
+    transform = poly.fit_transform(longDf)
+
+    reg.fit(transform,latDf)
+    predictions = reg.predict(transform)
+
+    for i in range(len(predictions)):
+        vertical_predicted_path.append([predictions[i][0],longDf["longitudes"][i]])
+
+    
+    # west-east regression
+    horizontal_predicted_path = []
     transform = poly.fit_transform(latDf)
 
     reg.fit(transform,longDf)
     predictions = reg.predict(transform)
-    ending_path = []
 
-    
-    predicted_path = []
     for i in range(len(predictions)):
-        predicted_path.append([latDf["latitudes"][i],predictions[i][0]])
-    sorted_path = sorted(predicted_path, key=lambda k: [k[1], k[0]])
+        horizontal_predicted_path.append([latDf["latitudes"][i], predictions[i][0]])
 
-    return sorted_path
+    # return sorted horizontal and vertical prediction
+    return sorted(horizontal_predicted_path, key=lambda k: [k[1], k[0]]), \
+            sorted(vertical_predicted_path, key=lambda k: [k[0], k[1]])
 
-def formatting(path,input,start):
+def formatting(hpath,vpath,training_set,trajectory):
     """
-        Method used to format output data, remove part of the prediction that was already passed
+        Method used to format output data
+
+        hpath - "horizontal" regression prediction
+        vpath - "vertical" regression prediction
+        training_set - set of all routes used in prediction
+        trajectory - distance that was already passed
     """
+    # determine direction of trajectory
+    regres = linear_regression(trajectory[-10:])
+
     # path manipulation (filtering, road matching and so on)
-    filtered_path = []
-    for coordinate in path:
-        if start[0][0] > coordinate[0]:
-            if(len(filtered_path)==11):
-                a=filtered_path[0]
-                b=filtered_path[10]
-            filtered_path.append(coordinate)
+    h_subpath = []
+    v_subpath = []
+    for hcoor in hpath:
+        # filter to show only the points within 2 km
+        if geoutil.distance(trajectory[-1],hcoor)<2:
+            if(len(h_subpath)==11):
+                ha=h_subpath[0]
+                hb=h_subpath[10]
+            h_subpath.append(hcoor)
+    for vcoor in vpath:
+        if geoutil.distance(trajectory[-1],vcoor)<2:
+            if(len(v_subpath)==11):
+                va=v_subpath[0]
+                vb=v_subpath[10]
+            v_subpath.append(vcoor)
 
-    # calculate direction vector
-    deltaX = (b[0]-a[0])/2
-    deltaY = (b[1]-a[1])/2
-    dirX = (start[2][0] - start[0][0])/2
-    dirY = (start[2][1] - start[0][1])/2
-    base_point = start[-1]
+    # calculate direction vector prediction
+    deltaX = (hb[0]-ha[0])/4 + (vb[0]-va[0])/4
+    deltaY = (hb[1]-ha[1])/4 + (vb[1]-va[1])/4
+    dirX = (trajectory[2][0] - trajectory[0][0])/4
+    dirY = (trajectory[2][1] - trajectory[0][1])/4
+    base_point = trajectory[-1]
     predicted_path = []
     for i in range(10):
         new_point = [base_point[0]+deltaX+dirX,base_point[1]+deltaY+dirY]
@@ -115,73 +156,10 @@ def formatting(path,input,start):
         base_point = new_point
 
     return {
-        "input": geojson_path_converter(input),
-        "optional": geojson_path_converter(roads_matching(predicted_path)),
-        "predicted": geojson_path_converter(filtered_path),
-        "direction": geojson_path_converter(predicted_path)
-    }
-
-def roads_matching(sorted_path):
-    """
-        ALPHA VERSION: not sure it works
-    """
-    return_path = []
-    # api can only take in 100 points at the time
-    for _ in range(1):
-
-        values = []
-        prev = datetime(2018,10,10,11,34,59)
-        for _ in range(len(sorted_path)):
-            min = str('%02d' % prev.minute)
-            sec = str('%02d' % prev.second)
-            values.append(str(prev.year)+"-"+str(prev.month)+"-"+str(prev.day)+"T"+str(prev.hour)+":"+min+":"+sec+"Z")
-            prev = prev + timedelta(0,5)
-
-        line = {
-        "type": "Feature",
-        "properties": {
-            "coordTimes": {}
-        },
-        "geometry": {
-            "type": "LineString",
-            "coordinates": sorted_path[:100]}}
-
-        service = MapMatcher(access_token="pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqbnliMmVoeTA1MTMzcG54Y3h2bnFtYmwifQ.o6CzepqOg00rpv7wKNeOuQ")
-        response = service.match(line, profile='mapbox.driving')
-        max = 0
-        best = 0
-        try:
-            features = response.geojson()['features']
-            for i in range(len(features)):
-                if len(features[i]['geometry']['coordinates'])>max and features[i]['properties']['confidence'] > 0.1:
-                    max = len(features[i]['geometry']['coordinates'])
-                    best = i
-
-            corrected = response.geojson()['features'][best]['geometry']['coordinates']
-
-            for corr in corrected:
-                return_path.append(corr)
-        except Exception as e:
-            print(e)
-
-    return return_path
-
-def geojson_path_converter(path):
-    """
-        converts list of [latitude,longitude] to geojson point features list
-    """
-    geojson_path = []
-    for coordinate in path:
-        geojson_path.append({
-                "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [coordinate[0], coordinate[1]]
-                    }
-                })
-    return {
-        "type": "FeatureCollection",
-        "features": geojson_path
+        "training": geoutil.geojson_path_converter(training_set),
+        "optional": geoutil.geojson_path_converter(regres),
+        "predicted": geoutil.geojson_path_converter(h_subpath+v_subpath),
+        "direction": geoutil.geojson_path_converter(predicted_path)
     }
 
 def main():
