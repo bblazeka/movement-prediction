@@ -1,25 +1,11 @@
-const endpoint = "http://localhost:5000/api/path"
+export const PREDICT_PATH = 'PREDICT_PATH'
+export const GENERAL_PREDICTION_LOADED = 'GENERAL_PREDICTION_LOADED'
+export const INDIVIDUAL_PREDICTION_LOADED = 'INDIVIDUAL_PREDICTION_LOADED'
 
-export const predictedPath = (user,path) => (dispatch, getState) => {
-    fetch(endpoint+"?user="+user+"&input="+path)
-      .then(response => {
-        console.log(response)
-        if (response.status !== 200) {
-          return this.setState({ placeholder: "Something went wrong" });
-        }
-        return response.json();
-      })
-      .then(data => {
-          if (user === 0) {
-            dispatch({
-              type: 'GENERAL_PREDICTION_LOADED',
-              payload: data
-            })
-          } else {
-            dispatch({
-              type: 'SPECIFIC_PREDICTION_LOADED',
-              payload: data
-            })
-          }
-        });
-}
+export const predictedPath = (user,path) => ({
+  type: PREDICT_PATH,
+  payload: {
+    user,
+    path
+  }
+})
