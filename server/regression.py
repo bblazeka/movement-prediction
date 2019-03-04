@@ -4,10 +4,8 @@ import sys, os
 import json
 import pandas as pd
 from collections import defaultdict
-from datetime import datetime
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
-from datetime import datetime, timedelta
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 import geoutil
@@ -156,6 +154,7 @@ def formatting(hpath,vpath,training_set,trajectory):
         base_point = new_point
 
     return {
+        "advanced": geoutil.geojson_path_converter(geoutil.roads_matching(predicted_path)),
         "training": geoutil.geojson_path_converter(training_set),
         "optional": geoutil.geojson_path_converter(regres),
         "predicted": geoutil.geojson_path_converter(h_subpath+v_subpath),

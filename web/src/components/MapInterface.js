@@ -1,15 +1,29 @@
 import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { connect } from 'react-redux';
+import Switch from '@material-ui/core/Switch';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+
 import * as appActions from '../actions/appActions';
-
 import './Map.css';
-import { individualLayer, generalLayer, inputLayer, emptyFeatureCollection, optionalLayer } from './MapUtils';
+import * as utils from './MapUtils';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqcWprdnNodzA0aDMzeHMxZndrYnhucDgifQ.jUE6YbihyEe0kvTfbvD6iw';
+mapboxgl.accessToken = utils.token;
 
 class MapInterface extends Component {
     map;
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            advanced: true,
+            prediction: true,
+            direction: true,
+            optional: true,
+            training: false
+        }
+    }
 
     static defaultProps = {
         center: { lat: 41.15, lng: -8.61 },
@@ -56,10 +70,27 @@ class MapInterface extends Component {
 
     componentWillReceiveProps(nextProps) {
         const map = this.map;
-        map.getSource('individual').setData(nextProps.general.predicted);
-        map.getSource('general').setData(nextProps.general.direction);
+        map.getSource('prediction').setData(nextProps.general.predicted);
+        map.getSource('training').setData(nextProps.general.training);
+        map.getSource('direction').setData(nextProps.general.direction);
         map.getSource('optional').setData(nextProps.general.optional);
+        map.getSource('advanced').setData(nextProps.general.advanced);
     }
+
+    toggleVisibility = name => event => {
+        const map = this.map;
+        const clickedLayer = name+'-layer'
+        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+             
+            if (visibility === 'visible') {
+            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            this.className = '';
+            } else {
+            this.className = 'active';
+            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+        }
+        this.setState({ [name]: event.target.checked });
+    };
 
     loadMap() {
         const map = new mapboxgl.Map({
@@ -70,14 +101,18 @@ class MapInterface extends Component {
         });
         let that = this;
         map.on('load', function () {
-            map.addSource('individual', emptyFeatureCollection);
-            map.addSource('general', emptyFeatureCollection);
-            map.addSource('input', emptyFeatureCollection);
-            map.addSource('optional', emptyFeatureCollection);
-            map.addLayer(individualLayer);
-            map.addLayer(generalLayer);
-            map.addLayer(inputLayer);
-            map.addLayer(optionalLayer);
+            map.addSource('advanced', utils.emptyFeatureCollection);
+            map.addSource('prediction', utils.emptyFeatureCollection);
+            map.addSource('direction', utils.emptyFeatureCollection);
+            map.addSource('input', utils.emptyFeatureCollection);
+            map.addSource('optional', utils.emptyFeatureCollection);
+            map.addSource('training', utils.emptyFeatureCollection);
+            map.addLayer(utils.advancedLayer);
+            map.addLayer(utils.predictionLayer);
+            map.addLayer(utils.directionLayer);
+            map.addLayer(utils.inputLayer);
+            map.addLayer(utils.optionalLayer);
+            map.addLayer(utils.trainingLayer);
             map.resize();
         });
         let path = []
@@ -95,9 +130,35 @@ class MapInterface extends Component {
         this.map = map;
     }
 
+    renderButtons() {
+        let controls = [];
+        utils.toggleableLayers.forEach((value) => {
+            controls.push(
+            <FormControlLabel
+                control={
+                  <Switch
+                    checked={this.state[value]}
+                    onChange={this.toggleVisibility(value)}
+                  />
+                }
+                key={'button-'+value}
+                label={'toggle '+value}
+              />
+            
+          )
+        });
+        return controls;
+    }
+
     render() {
         return (
-            <div ref={el => this.mapContainer = el} className="map"/>
+            <div>
+                <div ref={el => this.mapContainer = el} className="map"/>
+                <FormGroup row>
+                  {this.renderButtons()}
+                </FormGroup>
+            </div>
+            
         )
     }
 }
