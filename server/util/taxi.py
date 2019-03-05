@@ -31,7 +31,7 @@ def loadCsv():
     for line in lines:
         dataset.append(line)
         i+=1
-        if(i>5000):
+        if(i>10000):
             break
     return dataset
 
@@ -89,8 +89,8 @@ def ndarrayConverter(data):
     for point in data:
         try:
             ndarraylist.append([float(point.split(",")[0]),float(point.split(",")[1])])
-        except:
-            # error in parsing
+        except Exception as e:
+            print('Parsing error: '+str(e))
             pass
     return numpy.array(ndarraylist)
 
@@ -99,12 +99,16 @@ def containing(points,query,precision=0.001):
     """
         Check if query is contained within given points array
     """
-    trim_factor = len(query)+1
-    for i in range(len(points)-trim_factor):
-        for j in range(len(query)):
-            if abs(points[j+i][0]-query[j][0])>precision or abs(points[i+j][1]-query[j][1])>precision:
+    # remove first third of the query when generating a pattern
+    pattern = query[int(len(query)/3):]
+    # take subsets of points and check if they are equal to the query
+    for i in range(len(points)-(len(query)+1)):
+        # iterate over each point in both lists and return True if they are equal
+        for j in range(len(pattern)):
+            if abs(points[j+i][0]-pattern[j][0])>precision or abs(points[i+j][1]-pattern[j][1])>precision:
                 break
-            return True
+            if j+1 == len(pattern):
+                return True
     return False
 
 def starting(points,query,precision=0.001):

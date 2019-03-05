@@ -67,6 +67,6 @@ def roads_matching(sorted_path):
             for corr in corrected:
                 return_path.append(corr)
         except Exception as e:
-            print(e)
+            print("Road matching failed: "+str(e))
 
     return return_path

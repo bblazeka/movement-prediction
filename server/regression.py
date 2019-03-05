@@ -43,17 +43,16 @@ def prepare_data(query,user=0,daytype="A"):
     # pass all paths and generate big array of float points
     try:
         allPoints = numpy.concatenate(paths)
-    except:
-        print("no paths found")
-
-    output_points = []
-    for point in allPoints[:-1]:
-        output_points.append({
-            "lat":point[1],
-            "long":point[0]
-        })
-
-    return allPoints[:-1],query
+        output_points = []
+        for point in allPoints[:-1]:
+            output_points.append({
+                "lat":point[1],
+                "long":point[0]
+            })
+        return allPoints[:-1],query
+    except Exception as e:
+        print("No paths found: "+str(e))
+        return [],query
 
 def linear_regression(points):
     """
@@ -71,6 +70,10 @@ def poly_regression(points,precision=8):
     """
         Implementation of polynomal regression
     """
+    # return empty lists if input is empty
+    if points == []:
+        return [],[]
+
     latitudes = []
     longitudes = []
     for point in points[:-1]:
@@ -142,16 +145,19 @@ def formatting(hpath,vpath,training_set,trajectory):
             v_subpath.append(vcoor)
 
     # calculate direction vector prediction
-    deltaX = (hb[0]-ha[0])/4 + (vb[0]-va[0])/4
-    deltaY = (hb[1]-ha[1])/4 + (vb[1]-va[1])/4
-    dirX = (trajectory[2][0] - trajectory[0][0])/4
-    dirY = (trajectory[2][1] - trajectory[0][1])/4
-    base_point = trajectory[-1]
     predicted_path = []
-    for i in range(10):
-        new_point = [base_point[0]+deltaX+dirX,base_point[1]+deltaY+dirY]
-        predicted_path.append(new_point)
-        base_point = new_point
+    try:
+        deltaX = (hb[0]-ha[0])/4 + (vb[0]-va[0])/4
+        deltaY = (hb[1]-ha[1])/4 + (vb[1]-va[1])/4
+        dirX = (trajectory[2][0] - trajectory[0][0])/4
+        dirY = (trajectory[2][1] - trajectory[0][1])/4
+        base_point = trajectory[-1]
+        for i in range(20):
+            new_point = [base_point[0]+deltaX+dirX,base_point[1]+deltaY+dirY]
+            predicted_path.append(new_point)
+            base_point = new_point
+    except Exception as e:
+        print("Predicted trajectory error: "+str(e))
 
     return {
         "advanced": geoutil.geojson_path_converter(geoutil.roads_matching(predicted_path)),
