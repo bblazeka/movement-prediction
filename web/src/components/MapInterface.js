@@ -17,7 +17,7 @@ class MapInterface extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            advanced: true,
+            advanced: false,
             prediction: false,
             direction: true,
             optional: false,

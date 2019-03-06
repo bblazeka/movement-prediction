@@ -79,7 +79,7 @@ export const advancedLayer = {
    'type': 'circle',
     'source': 'advanced',
    'layout': {
-        'visibility': 'visible'
+        'visibility': 'none'
     },
     'paint': {
     'circle-radius': 2,

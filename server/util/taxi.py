@@ -100,7 +100,7 @@ def containing(points,query,precision=0.001):
         Check if query is contained within given points array
     """
     # remove first third of the query when generating a pattern
-    pattern = query[int(len(query)/3):]
+    pattern = query[int(len(query)/2):]
     # take subsets of points and check if they are equal to the query
     for i in range(len(points)-(len(query)+1)):
         # iterate over each point in both lists and return True if they are equal

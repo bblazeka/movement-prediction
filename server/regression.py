@@ -126,34 +126,33 @@ def formatting(hpath,vpath,training_set,trajectory):
     """
     # determine direction of trajectory
     regres = linear_regression(trajectory[-10:])
+    first_point = regres[0]
+    last_point = regres[-1]
 
     # path manipulation (filtering, road matching and so on)
     h_subpath = []
     v_subpath = []
+    # filter to show only the points within 2 km
     for hcoor in hpath:
-        # filter to show only the points within 2 km
         if geoutil.distance(trajectory[-1],hcoor)<2:
-            if(len(h_subpath)==11):
-                ha=h_subpath[0]
-                hb=h_subpath[10]
             h_subpath.append(hcoor)
     for vcoor in vpath:
         if geoutil.distance(trajectory[-1],vcoor)<2:
-            if(len(v_subpath)==11):
-                va=v_subpath[0]
-                vb=v_subpath[10]
             v_subpath.append(vcoor)
 
     # calculate direction vector prediction
     predicted_path = []
     try:
-        deltaX = (hb[0]-ha[0])/4 + (vb[0]-va[0])/4
-        deltaY = (hb[1]-ha[1])/4 + (vb[1]-va[1])/4
-        dirX = (trajectory[2][0] - trajectory[0][0])/4
-        dirY = (trajectory[2][1] - trajectory[0][1])/4
+        # remove first third of each regression
+        h_start = int(len(h_subpath)/2)
+        v_start = int(len(v_subpath)/2)
         base_point = trajectory[-1]
-        for i in range(20):
-            new_point = [base_point[0]+deltaX+dirX,base_point[1]+deltaY+dirY]
+        for i in range(10):
+            deltaX = (h_subpath[h_start+i+1][0]-h_subpath[h_start+i][0] + v_subpath[v_start+i+1][0] - v_subpath[v_start+i][0])*2
+            deltaY = (h_subpath[h_start+i+1][1]-h_subpath[h_start+i][1] + v_subpath[v_start+i+1][1] - v_subpath[v_start+i][1])*2
+            dirX = (last_point[0]-first_point[0])/20
+            dirY = (last_point[1]-first_point[1])/20
+            new_point = [base_point[0]+(deltaX+dirX),base_point[1]+(deltaY+dirY)]
             predicted_path.append(new_point)
             base_point = new_point
     except Exception as e:
