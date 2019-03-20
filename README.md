@@ -1,5 +1,9 @@
 # Movement Prediction
 
+Description to be added...
+
+# Running
+
 - database: MongoDB (run with: `sudo service mongod start`)
 
 - run pipenv: pipenv shell

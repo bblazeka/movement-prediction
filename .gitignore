@@ -165,3 +165,4 @@ yarn-error.log*
 
 # Project specific folder containing data
 data/
+cache/
