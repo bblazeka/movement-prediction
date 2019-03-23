@@ -2,6 +2,7 @@ from flask import (Flask, request)
 from flask_cors import CORS
 from . import regression
 from flask.json import jsonify
+from .neural_network import NeuralNetwork
 
 app = Flask(__name__)
 CORS(app)
@@ -18,3 +19,8 @@ def path():
     horizontal, vertical = regression.poly_regression(points)
     formatted = regression.formatting(horizontal,vertical,points,query)
     return jsonify(formatted)
+
+@app.route('/api/alternative', methods=['GET', 'POST'])
+def alternative():
+    network = NeuralNetwork()
+    return jsonify(network.evaluating())

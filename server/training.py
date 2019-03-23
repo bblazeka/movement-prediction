@@ -11,9 +11,8 @@ from keras.layers.embeddings import Embedding
 from keras.layers import Concatenate, Input
 from keras.layers.core import Dense, Reshape, Activation, Dropout
 from keras.callbacks import ModelCheckpoint
-from utils import tf_haversine
-from data import load_data
-from utils import get_clusters
+from .utils import tf_haversine, get_clusters
+from .data import load_data
 
 
 def start_new_session():
