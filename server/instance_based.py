@@ -2,6 +2,7 @@ import sys, os
 import traceback
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
+import geoutil
 
 def get_similar(trajectory):
     """
@@ -9,18 +10,25 @@ def get_similar(trajectory):
     """
     data = taxi.loadCsv()
     trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
+    lengthA = geoutil.path_length(trajectoryA)
     minDistance = 1
     similarTrajectory = []
     for x in range(1,len(data)):
         try:
             trajectoryB = taxi.ndarrayConverter(taxi.pointsListConverter(data[x][8]))
             distance = taxi.calculate_hausdorff(trajectoryA,trajectoryB)
-            if distance<minDistance:
+            lengthB = geoutil.path_length(trajectoryB)
+            if distance < minDistance and lengthA < 0.8*lengthB and distance > 0:
                 minDistance = distance
                 similarTrajectory = trajectoryB.tolist()
         except Exception as e:
             pass
     return similarTrajectory
+
+def formatting(path):
+    return {
+        "predicted": geoutil.geojson_path_converter(path)
+    }
 
 def main():
     # not used in this application

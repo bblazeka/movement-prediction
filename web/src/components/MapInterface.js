@@ -67,10 +67,15 @@ class MapInterface extends Component {
 
     componentWillReceiveProps(nextProps) {
         const map = this.map;
-        map.getSource('prediction').setData(nextProps.general.predicted);
+        // layer with prediction from instance based learning
+        map.getSource('prediction').setData(nextProps.general.instancebased.predicted);
+        // layer with training data
         map.getSource('training').setData(nextProps.general.training);
+        // layer with prediction from polynomial regression
         map.getSource('direction').setData(nextProps.general.direction);
+        // layer with linear regression of last few points of input data
         map.getSource('optional').setData(nextProps.general.optional);
+        // polynomial regression prediction with road matching applied
         map.getSource('advanced').setData(nextProps.general.advanced);
     }
 

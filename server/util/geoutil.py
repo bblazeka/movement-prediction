@@ -20,6 +20,12 @@ def geojson_path_converter(path):
         "features": geojson_path
     }
 
+def path_length(path):
+    """
+        calculates the length of a path
+    """
+    return distance((path[0][0],path[0][1]),(path[-1][0],path[-1][1]))
+
 def distance(a,b):
     """
         calculates the haversine distance between two points

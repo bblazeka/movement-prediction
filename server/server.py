@@ -15,9 +15,10 @@ def hello():
 def path():
     path = request.args.get('input', '')
     user = int(request.args.get('user', ''))
-    points, query = regression.prepare_data(path,user=user)
-    horizontal, vertical = regression.poly_regression(points)
-    formatted = regression.formatting(horizontal,vertical,points,query)
+    training, query = regression.prepare_data(path,user=user)
+    horizontal, vertical = regression.poly_regression(training)
+    formatted = regression.formatting(horizontal,vertical,training,query)
+    formatted["instancebased"] = instance_based.formatting(instance_based.get_similar(path))
     return jsonify(formatted)
 
 @app.route('/api/ibl', methods=['GET', 'POST'])
