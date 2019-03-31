@@ -10,15 +10,14 @@ def get_similar(trajectory):
     """
     data = taxi.loadCsv()
     trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
-    lengthA = geoutil.path_length(trajectoryA)
-    minDistance = 1
+    minDistance = 0.5
     similarTrajectory = []
     for x in range(1,len(data)):
         try:
             trajectoryB = taxi.ndarrayConverter(taxi.pointsListConverter(data[x][8]))
             distance = taxi.calculate_hausdorff(trajectoryA,trajectoryB)
             lengthB = geoutil.path_length(trajectoryB)
-            if distance < minDistance and lengthA < 0.8*lengthB and distance > 0:
+            if distance < minDistance and distance > 0.005 and lengthB > 1 and taxi.containing(trajectoryB,trajectoryA[-8:]):
                 minDistance = distance
                 similarTrajectory = trajectoryB.tolist()
         except Exception as e:

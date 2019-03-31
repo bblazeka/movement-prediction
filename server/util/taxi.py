@@ -31,7 +31,7 @@ def loadCsv():
     for line in lines:
         dataset.append(line)
         i+=1
-        if(i>10000):
+        if(i>1000):
             break
     return dataset
 
