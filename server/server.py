@@ -2,7 +2,7 @@ from flask import (Flask, request)
 from flask_cors import CORS
 from . import regression
 from flask.json import jsonify
-from .neural_network import NeuralNetwork
+from . import instance_based
 
 app = Flask(__name__)
 CORS(app)
@@ -20,7 +20,7 @@ def path():
     formatted = regression.formatting(horizontal,vertical,points,query)
     return jsonify(formatted)
 
-@app.route('/api/alternative', methods=['GET', 'POST'])
-def alternative():
-    network = NeuralNetwork()
-    return jsonify(network.evaluating())
+@app.route('/api/ibl', methods=['GET', 'POST'])
+def ibl():
+    path = request.args.get('input', '')
+    return jsonify(instance_based.get_similar(path))

@@ -90,7 +90,7 @@ def ndarrayConverter(data):
         try:
             ndarraylist.append([float(point.split(",")[0]),float(point.split(",")[1])])
         except Exception as e:
-            print('Parsing error: '+str(e))
+            # parsing error, probably is the list empty
             pass
     return numpy.array(ndarraylist)
 
@@ -142,6 +142,14 @@ def convertPoints(points):
         geo_points.append([lat,long])
     return geo_points
 
+def calculate_hausdorff(A,B):
+    """
+        Returns hausdorff distance or 1000 if input is empty
+    """
+    if len(A) == 0 or len(B) == 0:
+        return 1000.0
+    else:
+        return hausdorff(A,B)
 
 def generate():
     """

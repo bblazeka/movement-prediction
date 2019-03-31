@@ -1,6 +1,6 @@
 # Movement Prediction
 
-Description to be added...
+Dynamic movement prediction project. Detailed description to be added...
 
 # Running
 
