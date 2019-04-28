@@ -1,8 +1,7 @@
 from flask import (Flask, request)
 from flask_cors import CORS
-from . import regression
+from . import regression, instance_based, markov
 from flask.json import jsonify
-from . import instance_based
 
 app = Flask(__name__)
 CORS(app)
@@ -25,3 +24,8 @@ def path():
 def ibl():
     path = request.args.get('input', '')
     return jsonify(instance_based.get_similar(path))
+
+@app.route('/api/markov', methods=['GET', 'POST'])
+def markovModel():
+    path = request.args.get('input', '')
+    return jsonify(markov.predict("4610600"))
