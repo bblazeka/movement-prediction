@@ -46,7 +46,7 @@ class MapInterface extends Component {
             })
         }
         // currently disabled personalized prediction: change 0 and 4
-        that.props.getPrediction(0,JSON.stringify(path).replace(/['"]+/g, ''))
+        that.props.getPrediction('compare',0,JSON.stringify(path).replace(/['"]+/g, ''))
     }
 
     componentDidMount() {
@@ -171,7 +171,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-    getPrediction: (user,path) => dispatch(appActions.predictedPath(user,path))
+    getPrediction: (path,user,query) => dispatch(appActions.predictedPath(path,user,query))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapInterface);

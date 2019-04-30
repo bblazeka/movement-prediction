@@ -35,7 +35,19 @@ class SUMO:
                     routes[child.attrib["id"]]=route.attrib['edges'].split(" ")
         self.routes = routes
 
+    def convertToLatLonRoute(self,route):
+        """
+            Converts an array of node ids to an array of lat,lon pairs
+        """
+        converted = []
+        for node in route:
+            converted.push(getLatLon(node))
+        return converted
+
     def getLatLon(self,code):
+        """
+            Converts an id of a node to a lat,lon pair
+        """
         nodes = []
         scrapped = code.replace("-","").split("#")
         if len(scrapped) > 1:
