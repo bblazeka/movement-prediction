@@ -1,4 +1,4 @@
-from mapbox import MapMatcher
+from mapbox import Directions, MapMatcher
 from haversine import haversine
 from datetime import datetime, timedelta
 
@@ -76,3 +76,28 @@ def roads_matching(sorted_path):
             print("Road matching failed: "+str(e))
 
     return return_path
+
+def concatenate_points(start,end):
+    """
+        Joins two points. Used to convert road segment representation to trajectory
+    """
+    service = Directions(access_token="pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqbnliMmVoeTA1MTMzcG54Y3h2bnFtYmwifQ.o6CzepqOg00rpv7wKNeOuQ")
+    origin = {
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': start,
+        }
+    }
+    destination = {
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': end,
+        }
+    }
+    response = service.directions([origin, destination],'mapbox/driving')
+    return response.geojson()
+
+if __name__ == '__main__':
+    print(concatenate_points([13.4010032, 52.5183224],[13.4006712, 52.5182224]))
