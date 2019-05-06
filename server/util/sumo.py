@@ -52,12 +52,18 @@ class SUMO:
         scrapped = code.replace("-","").split("#")
         if len(scrapped) > 1:
             # we are looking for a specific segment
-            nodes.append(self.elements[self.ways[scrapped[0]][int(scrapped[1])]])
+            nodes.append(self.elements[self.ways[scrapped[0]][int(scrapped[1].replace('AddedOnRampEdge',''))]])
         else:
             # we take whole element in
             for node in self.ways[scrapped[0]]:
                 nodes.append(self.elements[node])
         return nodes
+
+    def getClosest(self,lat,lon):
+        """
+            Returns the closest node to a specific lat,lon pair
+        """
+        pass
 
     def generateMarkov(self):
         # count of transitions between states

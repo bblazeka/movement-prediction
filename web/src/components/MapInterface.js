@@ -17,11 +17,11 @@ class MapInterface extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            advanced: false,
-            prediction: true,
-            direction: true,
-            optional: false,
-            training: false
+            maroon: false,
+            blue: true,
+            black: true,
+            red: false,
+            orange: false
         }
     }
 
@@ -32,7 +32,7 @@ class MapInterface extends Component {
 
     request(that,path) {
         if (that.map) {
-            that.map.getSource('input').setData({
+            that.map.getSource('green').setData({
                 "type": "FeatureCollection",
                 "features": path.map(function(v) {
                     return {
@@ -68,15 +68,15 @@ class MapInterface extends Component {
     componentWillReceiveProps(nextProps) {
         const map = this.map;
         // layer with prediction from instance based learning
-        map.getSource('prediction').setData(nextProps.general.instancebased.predicted);
+        map.getSource('blue').setData(nextProps.general.blue);
         // layer with training data
-        map.getSource('training').setData(nextProps.general.training);
+        map.getSource('orange').setData(nextProps.general.orange);
         // layer with prediction from polynomial regression
-        map.getSource('direction').setData(nextProps.general.direction);
+        map.getSource('black').setData(nextProps.general.black);
         // layer with linear regression of last few points of input data
-        map.getSource('optional').setData(nextProps.general.optional);
+        map.getSource('red').setData(nextProps.general.red);
         // polynomial regression prediction with road matching applied
-        map.getSource('advanced').setData(nextProps.general.advanced);
+        map.getSource('maroon').setData(nextProps.general.maroon);
     }
 
     toggleVisibility = name => event => {
@@ -103,18 +103,18 @@ class MapInterface extends Component {
         });
         let that = this;
         map.on('load', function () {
-            map.addSource('advanced', utils.emptyFeatureCollection);
-            map.addSource('prediction', utils.emptyFeatureCollection);
-            map.addSource('direction', utils.emptyFeatureCollection);
-            map.addSource('input', utils.emptyFeatureCollection);
-            map.addSource('optional', utils.emptyFeatureCollection);
-            map.addSource('training', utils.emptyFeatureCollection);
-            map.addLayer(utils.advancedLayer);
-            map.addLayer(utils.predictionLayer);
-            map.addLayer(utils.directionLayer);
-            map.addLayer(utils.inputLayer);
-            map.addLayer(utils.optionalLayer);
-            map.addLayer(utils.trainingLayer);
+            map.addSource('maroon', utils.emptyFeatureCollection);
+            map.addSource('blue', utils.emptyFeatureCollection);
+            map.addSource('black', utils.emptyFeatureCollection);
+            map.addSource('green', utils.emptyFeatureCollection);
+            map.addSource('red', utils.emptyFeatureCollection);
+            map.addSource('orange', utils.emptyFeatureCollection);
+            map.addLayer(utils.maroonLayer);
+            map.addLayer(utils.blueLayer);
+            map.addLayer(utils.blackLayer);
+            map.addLayer(utils.greenLayer);
+            map.addLayer(utils.redLayer);
+            map.addLayer(utils.orangeLayer);
             map.resize();
         });
         let path = []
