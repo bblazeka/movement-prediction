@@ -2,7 +2,7 @@ from mapbox import Directions, MapMatcher
 from haversine import haversine
 from datetime import datetime, timedelta
 
-def geojson_path_converter(path):
+def geojson_path_converter(path,title):
     """
         converts list of [latitude,longitude] to geojson point features list
     """
@@ -17,6 +17,9 @@ def geojson_path_converter(path):
                 })
     return {
         "type": "FeatureCollection",
+        "properties": {
+            "title": title,
+        },
         "features": geojson_path
     }
 

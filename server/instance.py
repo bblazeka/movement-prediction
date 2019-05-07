@@ -33,7 +33,7 @@ class Instance(BaseMethod):
 
     def formatting(path):
         return {
-            "blue": geoutil.geojson_path_converter(path)
+            "blue": geoutil.geojson_path_converter(path,"instance_based_learning")
         }
 
 def main():

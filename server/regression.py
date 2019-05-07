@@ -178,11 +178,11 @@ class Regression(BaseMethod):
         self.predicted = predicted_path
 
         return {
-            "maroon": geoutil.geojson_path_converter(geoutil.roads_matching(predicted_path)),
-            "orange": geoutil.geojson_path_converter(self.training),
-            "red": geoutil.geojson_path_converter(regres),
-            "blue": geoutil.geojson_path_converter(h_subpath+v_subpath),
-            "black": geoutil.geojson_path_converter(predicted_path)
+            "maroon": geoutil.geojson_path_converter(geoutil.roads_matching(predicted_path),"road_matching"),
+            "orange": geoutil.geojson_path_converter(self.training,"training"),
+            "red": geoutil.geojson_path_converter(regres,"lin regression"),
+            "blue": geoutil.geojson_path_converter(h_subpath+v_subpath,"h and v regression"),
+            "black": geoutil.geojson_path_converter(predicted_path,"prediction")
         }
 
 def main():

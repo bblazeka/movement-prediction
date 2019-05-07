@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict
 import xml.etree.ElementTree as ET
+from geoutil import distance
 
 class SUMO:
 
@@ -59,11 +60,18 @@ class SUMO:
                 nodes.append(self.elements[node])
         return nodes
 
-    def getClosest(self,lat,lon):
+    def getClosest(self,point):
         """
-            Returns the closest node to a specific lat,lon pair
+            Returns the closest node to a specific [lon,lat] pair
         """
-        pass
+        min_distance = 1000
+        closest_key = ""
+        for key,coors in self.elements.items():
+            temp_distance = distance(coors,point)
+            if temp_distance < min_distance:
+                closest_key = key
+                min_distance = temp_distance
+        return closest_key
 
     def generateMarkov(self):
         # count of transitions between states
@@ -84,3 +92,13 @@ class SUMO:
             probabilites[transition]=count/visits[transition[0]]
 
         self.markov = probabilites
+
+def main():
+    # test method
+    sumo = SUMO()
+    sumo.parseElements("../../data/sumo/osm_bbox.osm.xml")
+    sumo.parseRoutes("../../data/sumo/osm.passenger.rou.xml")
+    print(sumo.getClosest([-8.610876000000001, 41.14557]))
+
+if __name__ == '__main__':
+    main()

@@ -67,16 +67,23 @@ class MapInterface extends Component {
 
     componentWillReceiveProps(nextProps) {
         const map = this.map;
+        const {
+            blue,
+            orange,
+            black,
+            red,
+            maroon,
+        } = nextProps.general;
         // layer with prediction from instance based learning
-        map.getSource('blue').setData(nextProps.general.blue);
+        map.getSource('blue').setData(blue);
         // layer with training data
-        map.getSource('orange').setData(nextProps.general.orange);
+        map.getSource('orange').setData(orange);
         // layer with prediction from polynomial regression
-        map.getSource('black').setData(nextProps.general.black);
+        map.getSource('black').setData(black);
         // layer with linear regression of last few points of input data
-        map.getSource('red').setData(nextProps.general.red);
+        map.getSource('red').setData(red);
         // polynomial regression prediction with road matching applied
-        map.getSource('maroon').setData(nextProps.general.maroon);
+        map.getSource('maroon').setData(maroon);
     }
 
     toggleVisibility = name => event => {

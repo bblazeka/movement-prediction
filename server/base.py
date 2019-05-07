@@ -11,7 +11,7 @@ class BaseMethod:
     
 def comparison(regression,instance,markov):
     return {
-        "blue": geoutil.geojson_path_converter(regression),
-        "red": geoutil.geojson_path_converter(instance),
-        "black": geoutil.geojson_path_converter(markov),
+        "blue": geoutil.geojson_path_converter(regression,"regression"),
+        "red": geoutil.geojson_path_converter(instance,"instance_based_learning"),
+        "black": geoutil.geojson_path_converter(markov,"markov"),
     }
