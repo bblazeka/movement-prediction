@@ -25,7 +25,7 @@ def compare():
     ibl.get_similar(path)
     # markov
     hmm = markov.Markov()
-    hmm.predict("39671211")
+    hmm.predict(path)
     return jsonify(base.comparison(regression.get_predict(),ibl.get_predict(),hmm.get_predict()))
 
 @app.route('/api/regression', methods=['GET'])

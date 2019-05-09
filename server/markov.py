@@ -2,6 +2,7 @@ import sys, os
 from base import BaseMethod
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import geoutil
+import taxi
 from sumo import SUMO
 
 class Markov(BaseMethod):
@@ -14,9 +15,10 @@ class Markov(BaseMethod):
 
 
     def predict(self,input):
-        state = input.split(" ")[0]
+        state = self.sumo.getClosest(taxi.parseCoordinatesArray(input)[-1])
+        prevStates = [state]
 
-        trajectory = self.sumo.getLatLon(state)
+        trajectory = self.sumo.getLatLonFromNode(state)
         while(True):
             max = 0
             nextState = ''
@@ -26,11 +28,12 @@ class Markov(BaseMethod):
                         nextState = transition[1]
                     if (probability == 1):
                         continue
-            if nextState == '':
+            if nextState == '' or nextState == state or (nextState in prevStates):
                 break
             else:
+                prevStates.append(state)
                 state = nextState
-            trajectory += self.sumo.getLatLon(state)
+            trajectory += self.sumo.getLatLonFromNode(state)
 
         self.predicted = trajectory
         return formatting(trajectory)
