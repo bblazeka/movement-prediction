@@ -12,8 +12,8 @@ export function* watcherSaga() {
   function sendRequest(params) {
       console.log(params)
     return axios({
-      method: "post",
-      url: "http://localhost:5000/api/path?user="+params.user+"&input="+params.path,
+      method: "get",
+      url: "http://localhost:5000/api/"+params.path+"?user="+params.user+"&input="+params.query,
       headers: {"Content-Type": "application/json"}
     });
   }

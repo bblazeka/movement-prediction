@@ -12,166 +12,215 @@ import * as utils from './MapUtils';
 mapboxgl.accessToken = utils.token;
 
 class MapInterface extends Component {
-    map;
+  map;
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            advanced: false,
-            prediction: true,
-            direction: true,
-            optional: false,
-            training: false
-        }
+  constructor(props) {
+    super(props);
+    this.state = {
+      maroon: {
+        title: '',
+        visible: false,
+      },
+      blue: {
+        title: '',
+        visible: false,
+      },
+      black: {
+        title: '',
+        visible: false,
+      },
+      red: {
+        title: '',
+        visible: false,
+      },
+      orange: {
+        title: '',
+        visible: false,
+      },
     }
+  }
 
-    static defaultProps = {
-        center: { lat: 41.15, lng: -8.61 },
-        zoom: 13
-    }
+  static defaultProps = {
+    center: { lat: 41.15, lng: -8.61 },
+    zoom: 13
+  }
 
-    request(that,path) {
-        if (that.map) {
-            that.map.getSource('input').setData({
-                "type": "FeatureCollection",
-                "features": path.map(function(v) {
-                    return {
-                           "type": "Feature",
-                            "geometry": {
-                                "type": "Point",
-                                 "coordinates": [v[0], v[1]]
-                            }
-                        };
-                    })
-            })
-        }
-        // currently disabled personalized prediction: change 0 and 4
-        that.props.getPrediction(0,JSON.stringify(path).replace(/['"]+/g, ''))
-    }
-
-    componentDidMount() {
-        this.loadMap();
-        let i = 0;
-        let that = this;
-        let path = utils.demoQuery();
-        let interval = window.setInterval(function() {
-            i++;
-            const array = JSON.parse(path)
-            const subpath = array.slice(0,i*5);
-            that.request(that,subpath)
-            if (i > 5) {
-                window.clearInterval(interval)
+  request(that, path) {
+    if (that.map) {
+      that.map.getSource('green').setData({
+        "type": "FeatureCollection",
+        "features": path.map(function (v) {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [v[0], v[1]]
             }
-        }, 5000);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const map = this.map;
-        // layer with prediction from instance based learning
-        map.getSource('prediction').setData(nextProps.general.instancebased.predicted);
-        // layer with training data
-        map.getSource('training').setData(nextProps.general.training);
-        // layer with prediction from polynomial regression
-        map.getSource('direction').setData(nextProps.general.direction);
-        // layer with linear regression of last few points of input data
-        map.getSource('optional').setData(nextProps.general.optional);
-        // polynomial regression prediction with road matching applied
-        map.getSource('advanced').setData(nextProps.general.advanced);
-    }
-
-    toggleVisibility = name => event => {
-        const map = this.map;
-        const clickedLayer = name+'-layer'
-        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-             
-            if (visibility === 'visible') {
-            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-            this.className = '';
-            } else {
-            this.className = 'active';
-            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-        }
-        this.setState({ [name]: event.target.checked });
-    };
-
-    loadMap() {
-        const map = new mapboxgl.Map({
-            container: this.mapContainer,
-            style: 'mapbox://styles/mapbox/streets-v9',
-            center: [this.props.center.lng, this.props.center.lat],
-            zoom: this.props.zoom
-        });
-        let that = this;
-        map.on('load', function () {
-            map.addSource('advanced', utils.emptyFeatureCollection);
-            map.addSource('prediction', utils.emptyFeatureCollection);
-            map.addSource('direction', utils.emptyFeatureCollection);
-            map.addSource('input', utils.emptyFeatureCollection);
-            map.addSource('optional', utils.emptyFeatureCollection);
-            map.addSource('training', utils.emptyFeatureCollection);
-            map.addLayer(utils.advancedLayer);
-            map.addLayer(utils.predictionLayer);
-            map.addLayer(utils.directionLayer);
-            map.addLayer(utils.inputLayer);
-            map.addLayer(utils.optionalLayer);
-            map.addLayer(utils.trainingLayer);
-            map.resize();
-        });
-        let path = []
-        that = this
-        map.on("click", function(e) {
-            let lng = e.lngLat.lng.toFixed(3);
-            let lat = e.lngLat.lat.toFixed(3);
-            path.push([lng,lat])
-            if (path.length > 3) {
-                that.request(that,path)
-            }
-            console.log(JSON.stringify(path).replace(/['"]+/g, ''))
+          };
         })
-        map.addControl(new mapboxgl.NavigationControl());
-        this.map = map;
+      })
     }
+    // currently disabled personalized prediction: change 0 and 4
+    that.props.getPrediction('compare', 0, JSON.stringify(path).replace(/['"]+/g, ''))
+  }
 
-    renderButtons() {
-        let controls = [];
-        utils.toggleableLayers.forEach((value) => {
-            controls.push(
-            <FormControlLabel
-                control={
-                  <Switch
-                    checked={this.state[value]}
-                    onChange={this.toggleVisibility(value)}
-                  />
-                }
-                key={'button-'+value}
-                label={'toggle '+value}
-              />
-            
-          )
-        });
-        return controls;
-    }
+  componentDidMount() {
+    this.loadMap();
+    let i = 0;
+    let that = this;
+    let path = utils.demoQuery();
+    let interval = window.setInterval(function () {
+      i++;
+      const array = JSON.parse(path)
+      const subpath = array.slice(0, i * 5);
+      that.request(that, subpath)
+      if (i > 5) {
+        window.clearInterval(interval)
+      }
+    }, 5000);
+  }
 
-    render() {
-        return (
-            <div>
-                <div ref={el => this.mapContainer = el} className="map"/>
-                <FormGroup row>
-                  {this.renderButtons()}
-                </FormGroup>
-            </div>
-            
-        )
+  componentWillReceiveProps(nextProps) {
+    const map = this.map;
+    const {
+      blue,
+      orange,
+      black,
+      red,
+      maroon,
+    } = nextProps.general;
+    // layer with prediction from instance based learning
+    map.getSource('blue').setData(blue);
+    // layer with training data
+    map.getSource('orange').setData(orange);
+    // layer with prediction from polynomial regression
+    map.getSource('black').setData(black);
+    // layer with linear regression of last few points of input data
+    map.getSource('red').setData(red);
+    // polynomial regression prediction with road matching applied
+    map.getSource('maroon').setData(maroon);
+    this.setState({
+      blue: {
+        title: blue ? blue.properties.title : '',
+        visible: blue !== undefined,
+      },
+      orange: {
+        title: orange ? orange.properties.title : '',
+        visible: orange !== undefined,
+      },
+      black: {
+        title: black ? black.properties.title : '',
+        visible: black !== undefined,
+      },
+      red: {
+        title: red ? red.properties.title : '',
+        visible: red !== undefined,
+      },
+      maroon: {
+        title: maroon ? maroon.properties.title : '',
+        visible: maroon !== undefined,
+      },
+    })
+  }
+
+  toggleVisibility = name => event => {
+    const map = this.map;
+    const clickedLayer = name + '-layer'
+    var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+
+    if (visibility === 'visible') {
+      map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+      this.className = '';
+    } else {
+      this.className = 'active';
+      map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
     }
+    this.setState({
+      [name]: Object.assign({}, this.state[name], {
+        visible: event.target.checked
+      })
+    });
+  };
+
+  loadMap() {
+    const map = new mapboxgl.Map({
+      container: this.mapContainer,
+      style: 'mapbox://styles/mapbox/streets-v9',
+      center: [this.props.center.lng, this.props.center.lat],
+      zoom: this.props.zoom
+    });
+    let that = this;
+    map.on('load', function () {
+      map.addSource('maroon', utils.emptyFeatureCollection);
+      map.addSource('blue', utils.emptyFeatureCollection);
+      map.addSource('black', utils.emptyFeatureCollection);
+      map.addSource('green', utils.emptyFeatureCollection);
+      map.addSource('red', utils.emptyFeatureCollection);
+      map.addSource('orange', utils.emptyFeatureCollection);
+      map.addLayer(utils.maroonLayer);
+      map.addLayer(utils.blueLayer);
+      map.addLayer(utils.blackLayer);
+      map.addLayer(utils.greenLayer);
+      map.addLayer(utils.redLayer);
+      map.addLayer(utils.orangeLayer);
+      map.resize();
+    });
+    let path = []
+    that = this
+    map.on("click", function (e) {
+      let lng = e.lngLat.lng.toFixed(3);
+      let lat = e.lngLat.lat.toFixed(3);
+      path.push([lng, lat])
+      if (path.length > 3) {
+        that.request(that, path)
+      }
+      console.log(JSON.stringify(path).replace(/['"]+/g, ''))
+    })
+    map.addControl(new mapboxgl.NavigationControl());
+    this.map = map;
+  }
+
+  renderButtons() {
+    let controls = [];
+    utils.toggleableLayers.forEach((value) => {
+      controls.push(
+        <FormControlLabel
+          control={
+            <Switch
+              checked={this.state[value].visible}
+              onChange={this.toggleVisibility(value)}
+            />
+          }
+          disabled={!this.state[value].title}
+          key={'button-' + value}
+          label={'toggle ' + this.state[value].title}
+        />
+
+      )
+    });
+    return controls;
+  }
+
+  render() {
+    return (
+      <div>
+        <div ref={el => this.mapContainer = el} className="map" />
+        <FormGroup row>
+          {this.renderButtons()}
+        </FormGroup>
+      </div>
+
+    )
+  }
 }
 
 const mapStateToProps = state => ({
-    general: state.app.general,
-    individual: state.app.individual
+  general: state.app.general,
+  individual: state.app.individual
 })
 
 const mapDispatchToProps = dispatch => ({
-    getPrediction: (user,path) => dispatch(appActions.predictedPath(user,path))
+  getPrediction: (path, user, query) => dispatch(appActions.predictedPath(path, user, query))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(MapInterface);
