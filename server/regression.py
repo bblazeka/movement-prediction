@@ -25,7 +25,7 @@ class Regression(BaseMethod):
         
         # check if input is a string, parse to an array
         if type(query) is str:
-            query = taxi.parseCoordinatesArray(query)
+            query = geoutil.parseCoordinatesArray(query)
         
         # load data
         if user == 0:
@@ -44,7 +44,7 @@ class Regression(BaseMethod):
             points = taxi.pointsListConverter(data[x][8])
             if data[x][6]==daytype and len(points)>min_length:
                 # convert data to array of tuples of float values
-                geopoints = taxi.convertPoints(points)
+                geopoints = geoutil.convertPoints(points)
                 if taxi.containing(geopoints,query):
                     paths.append(geopoints)
 

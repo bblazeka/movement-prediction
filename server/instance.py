@@ -21,7 +21,7 @@ class Instance(BaseMethod):
         for x in range(1,len(data)):
             try:
                 trajectoryB = taxi.ndarrayConverter(taxi.pointsListConverter(data[x][8]))
-                distance = taxi.calculate_hausdorff(trajectoryA,trajectoryB)
+                distance = geoutil.calculate_hausdorff(trajectoryA,trajectoryB)
                 lengthB = geoutil.path_length(trajectoryB)
                 if distance < minDistance and distance > 0.005 and lengthB > 1 and taxi.containing(trajectoryB,trajectoryA[-8:]):
                     minDistance = distance

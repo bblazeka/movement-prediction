@@ -15,7 +15,7 @@ class Markov(BaseMethod):
 
 
     def predict(self,input):
-        state = self.sumo.getClosest(taxi.parseCoordinatesArray(input)[-1])
+        state = self.sumo.getClosest(geoutil.parseCoordinatesArray(input)[-1])
         prevStates = [state]
 
         trajectory = self.sumo.getLatLonFromNode(state)

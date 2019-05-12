@@ -1,7 +1,7 @@
 from flask import (Flask, request)
 from flask_cors import CORS
 from .regression import Regression
-from . import instance, markov, base
+from . import eval, instance, markov, base
 from flask.json import jsonify
 
 app = Flask(__name__)
@@ -27,6 +27,13 @@ def compare():
     hmm = markov.Markov()
     hmm.predict(path)
     return jsonify(base.comparison(regression.get_predict(),ibl.get_predict(),hmm.get_predict()))
+
+@app.route('/api/evaluate', methods=['GET'])
+def evaluate():
+    path = request.args.get('input', '')
+    evaluation = eval.Evaluation(path)
+    evals = evaluation.get_evaluations()
+    return jsonify(evals)
 
 @app.route('/api/regression', methods=['GET'])
 def path():

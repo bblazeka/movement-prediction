@@ -1,6 +1,37 @@
 from mapbox import Directions, MapMatcher
 from haversine import haversine
 from datetime import datetime, timedelta
+from MDAnalysis.analysis.psa import hausdorff
+
+def convertPoints(points):
+    """
+        Converts an array from string to float coordinates
+    """
+    geo_points = []
+    for point in points:
+        coors = point.split(",")
+        lat = float(coors[0])
+        long = float(coors[1])
+        geo_points.append([lat,long])
+    return geo_points
+
+def parseCoordinatesArray(array):
+    """
+        Convert array in string representation to an actual array of coordinates
+    """
+    coordinates = []
+    for coor in array[2:-2].split("],["):
+        coordinates.append(coor)
+    return convertPoints(coordinates)
+
+def calculate_hausdorff(A,B):
+    """
+        Returns hausdorff distance or 1000 if input is empty
+    """
+    if len(A) == 0 or len(B) == 0:
+        return 1000.0
+    else:
+        return hausdorff(A,B)
 
 def geojson_path_converter(path,title):
     """
