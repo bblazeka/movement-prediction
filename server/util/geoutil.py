@@ -39,13 +39,14 @@ def geojson_path_converter(path,title):
     """
     geojson_path = []
     for coordinate in path:
-        geojson_path.append({
-                "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [coordinate[0], coordinate[1]]
-                    }
-                })
+        if (len(coordinate) > 0):
+            geojson_path.append({
+                    "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [coordinate[0], coordinate[1]]
+                        }
+                    })
     return {
         "type": "FeatureCollection",
         "properties": {

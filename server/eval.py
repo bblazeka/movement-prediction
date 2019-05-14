@@ -8,34 +8,37 @@ import geoutil
 
 class Evaluation:
     def __init__(self,path):
-        # regression
-        regression = Regression()
-        regression.prepare_data(path)
-        regression.poly_regression()
-        regression.formatting()
-        # instance based learning
-        ibl = instance.Instance()
-        ibl.get_similar(path)
-        # markov
-        hmm = markov.Markov()
-        hmm.predict(path)
         self.input_path = geoutil.parseCoordinatesArray(path)
-        self.regression = regression
-        self.ibl = ibl
-        self.hmm = hmm
+        self.regression = Regression()
+        self.ibl = instance.Instance()
+        self.hmm = markov.Markov()
     
     def get_evaluations(self,radius=0.5):
         """
             Returns evaluations in certain area
         """
-        center = self.input_path[-1]
-        input_path = numpy.array(self.input_path)
-        reg_filtered = numpy.array(self.regression.get_filtered_predict(center,radius))
-        ibl_filtered = numpy.array(self.ibl.get_filtered_predict(center,radius))
-        hmm_filtered = numpy.array(self.hmm.get_filtered_predict(center,radius))
-        reg_dist = geoutil.calculate_hausdorff(input_path,reg_filtered)
-        ibl_dist = geoutil.calculate_hausdorff(input_path,ibl_filtered)
-        hmm_dist = geoutil.calculate_hausdorff(input_path,hmm_filtered)
+        reg_dist = []
+        ibl_dist = []
+        hmm_dist = []
+        # split input path into patches of 5 points
+        input_patches = numpy.array_split(numpy.array(self.input_path),5)
+        for i in range(len(input_patches)):
+            path = input_patches[i]
+            center = path[-1]
+            # regression
+            self.regression.prepare_data(path)
+            self.regression.poly_regression()
+            self.regression.formatting()
+            # instance based learning
+            self.ibl.get_similar(path)
+            # markov
+            self.hmm.predict(path)
+            reg_filtered = numpy.array(self.regression.get_filtered_predict(center,radius))
+            ibl_filtered = numpy.array(self.ibl.get_filtered_predict(center,radius))
+            hmm_filtered = numpy.array(self.hmm.get_filtered_predict(center,radius))
+            reg_dist.append(geoutil.calculate_hausdorff(path,reg_filtered))
+            ibl_dist.append(geoutil.calculate_hausdorff(path,ibl_filtered))
+            hmm_dist.append(geoutil.calculate_hausdorff(path,hmm_filtered))
         return {
             "regression": reg_dist,
             "instance": ibl_dist,

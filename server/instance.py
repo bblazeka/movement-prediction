@@ -1,4 +1,5 @@
 import sys, os
+import numpy
 import traceback
 from base import BaseMethod
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
@@ -15,7 +16,10 @@ class Instance(BaseMethod):
             returns a route that is most similar
         """
         data = self.data
-        trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
+        if (isinstance(trajectory,numpy.ndarray)):
+            trajectoryA = trajectory
+        else:
+            trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
         minDistance = 0.5
         similarTrajectory = []
         for x in range(1,len(data)):

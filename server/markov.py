@@ -1,4 +1,5 @@
 import sys, os
+import numpy
 from base import BaseMethod
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import geoutil
@@ -15,7 +16,10 @@ class Markov(BaseMethod):
 
 
     def predict(self,input):
-        state = self.sumo.getClosest(geoutil.parseCoordinatesArray(input)[-1])
+        if (isinstance(input,numpy.ndarray)):
+            state = self.sumo.getClosest(input[-1])
+        else:
+            state = self.sumo.getClosest(geoutil.parseCoordinatesArray(input)[-1])
         prevStates = [state]
 
         trajectory = self.sumo.getLatLonFromNode(state)
