@@ -13,7 +13,7 @@ class Evaluation:
         self.ibl = instance.Instance()
         self.hmm = markov.Markov()
     
-    def get_evaluations(self,radius=0.5):
+    def get_evaluations(self,radius=1):
         """
             Returns evaluations in certain area
         """
@@ -25,6 +25,13 @@ class Evaluation:
         for i in range(len(input_patches)):
             path = input_patches[i]
             center = path[-1]
+            if i>0:
+                reg_filtered = numpy.array(self.regression.get_filtered_predict(center,radius))
+                ibl_filtered = numpy.array(self.ibl.get_filtered_predict(center,radius))
+                hmm_filtered = numpy.array(self.hmm.get_filtered_predict(center,radius))
+                reg_dist.append(geoutil.calculate_hausdorff(path,reg_filtered))
+                ibl_dist.append(geoutil.calculate_hausdorff(path,ibl_filtered))
+                hmm_dist.append(geoutil.calculate_hausdorff(path,hmm_filtered))
             # regression
             self.regression.prepare_data(path)
             self.regression.poly_regression()
@@ -33,12 +40,6 @@ class Evaluation:
             self.ibl.get_similar(path)
             # markov
             self.hmm.predict(path)
-            reg_filtered = numpy.array(self.regression.get_filtered_predict(center,radius))
-            ibl_filtered = numpy.array(self.ibl.get_filtered_predict(center,radius))
-            hmm_filtered = numpy.array(self.hmm.get_filtered_predict(center,radius))
-            reg_dist.append(geoutil.calculate_hausdorff(path,reg_filtered))
-            ibl_dist.append(geoutil.calculate_hausdorff(path,ibl_filtered))
-            hmm_dist.append(geoutil.calculate_hausdorff(path,hmm_filtered))
         return {
             "regression": reg_dist,
             "instance": ibl_dist,

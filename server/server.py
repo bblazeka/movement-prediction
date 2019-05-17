@@ -31,8 +31,9 @@ def compare():
 @app.route('/api/evaluate', methods=['GET'])
 def evaluate():
     path = request.args.get('input', '')
+    radius = int(request.args.get('radius', ''))
     evaluation = eval.Evaluation(path)
-    evals = evaluation.get_evaluations()
+    evals = evaluation.get_evaluations(radius)
     return jsonify(evals)
 
 @app.route('/api/regression', methods=['GET'])

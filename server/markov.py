@@ -16,6 +16,7 @@ class Markov(BaseMethod):
 
 
     def predict(self,input):
+        # set the last point of trajectory to be the initial point of prediction
         if (isinstance(input,numpy.ndarray)):
             state = self.sumo.getClosest(input[-1])
         else:
@@ -26,9 +27,11 @@ class Markov(BaseMethod):
         while(True):
             max = 0
             nextState = ''
+            # iterate over all transitions in the markov model
             for transition, probability in self.sumo.markov.items():
                 if state == transition[0]:
                     if (probability > max):
+                        max = probability
                         nextState = transition[1]
                     if (probability == 1):
                         continue

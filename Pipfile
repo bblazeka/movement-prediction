@@ -12,6 +12,7 @@ mdanalysis = "*"
 flask = "*"
 virtualenv = "*"
 flask-cors = "*"
+jupyter = "*"
 
 [dev-packages]
 
