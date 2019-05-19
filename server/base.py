@@ -8,6 +8,13 @@ class BaseMethod:
 
     def get_predict(self):
         return self.predicted
+
+    def get_filtered_predict(self,center,radius):
+        filtered = []
+        for point in self.predicted:
+            if geoutil.distance(point,center)<radius:
+                filtered.append(point)
+        return filtered
     
 def comparison(regression,instance,markov):
     return {
