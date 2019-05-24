@@ -12,15 +12,15 @@ class Markov(BaseMethod):
         self.sumo = SUMO()
         self.sumo.parseElements("../data/sumo/osm_bbox.osm.xml")
         self.sumo.parseRoutes("../data/sumo/osm.passenger.rou.xml")
-        self.sumo.generateMarkov()
+        self.sumo.generate_markov()
 
 
     def predict(self,input):
         # set the last point of trajectory to be the initial point of prediction
         if (isinstance(input,numpy.ndarray)):
-            state = self.sumo.getClosest(input[-1])
+            state = self.sumo.get_closest_node(input[-1])
         else:
-            state = self.sumo.getClosest(geoutil.parseCoordinatesArray(input)[-1])
+            state = self.sumo.get_closest_node(geoutil.parseCoordinatesArray(input)[-1])
         prevStates = [state]
 
         trajectory = self.sumo.getLatLonFromNode(state)

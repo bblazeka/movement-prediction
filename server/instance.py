@@ -5,35 +5,23 @@ from base import BaseMethod
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import taxi
 import geoutil
+import sumo
 
 class Instance(BaseMethod):
     
     def __init__(self):
-        self.data = taxi.loadCsv()
+        self.sumo = sumo.SUMO()
+        self.sumo.parseElements("../data/porto/osm_bbox.osm.xml")
+        self.sumo.parseRoutes("../data/porto/osm.passenger.rou.xml")
 
     def get_similar(self,trajectory):
         """
             returns a route that is most similar
         """
-        data = self.data
-        if (isinstance(trajectory,numpy.ndarray)):
-            trajectoryA = trajectory
-        else:
-            trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
-        minDistance = 0.5
-        similarTrajectory = []
-        for x in range(1,len(data)):
-            try:
-                trajectoryB = taxi.ndarrayConverter(taxi.pointsListConverter(data[x][8]))
-                distance = geoutil.calculate_hausdorff(trajectoryA,trajectoryB)
-                lengthB = geoutil.path_length(trajectoryB)
-                if distance < minDistance and distance > 0.005 and lengthB > 1 and taxi.containing(trajectoryB,trajectoryA[-8:]):
-                    minDistance = distance
-                    similarTrajectory = trajectoryB.tolist()
-            except Exception as e:
-                pass
-        self.predicted = similarTrajectory
-        return similarTrajectory
+        trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
+        node_array = self.sumo.convert_trajectory_to_nodearray(trajectoryA)
+        self.predicted = self.sumo.convert_nodearray_to_trajectory(self.sumo.longest_common_subsequence(node_array))
+        return self.predicted
 
     def formatting(path):
         return {

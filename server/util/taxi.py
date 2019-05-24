@@ -75,6 +75,12 @@ def loadRelated(id):
     return dataset
 
 def pointsListConverter(raw):
+    """
+        converts a string representation of trajectory, to a array of strings representing points
+    """
+    # make sure argument is a string
+    if (isinstance(raw,str)==False):
+        return raw
     raw = raw[2:]
     raw = raw[:-2]
     points = raw.split("],[")
@@ -84,6 +90,8 @@ def ndarrayConverter(data):
     """
         Converts a list of strings to ndarray
     """
+    if (isinstance(data,numpy.ndarray)):
+        return data
     ndarraylist = []
     for point in data:
         try:
