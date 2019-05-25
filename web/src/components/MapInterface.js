@@ -41,7 +41,7 @@ class MapInterface extends Component {
   }
 
   static defaultProps = {
-    center: { lat: 41.15, lng: -8.61 },
+    center: { lat: 45.8, lng: 15.97 },
     zoom: 13
   }
 
@@ -168,8 +168,8 @@ class MapInterface extends Component {
     let path = []
     that = this
     map.on("click", function (e) {
-      let lng = e.lngLat.lng.toFixed(3);
-      let lat = e.lngLat.lat.toFixed(3);
+      let lng = e.lngLat.lng.toFixed(4);
+      let lat = e.lngLat.lat.toFixed(4);
       path.push([lng, lat])
       if (path.length > 3) {
         that.request(that, path)

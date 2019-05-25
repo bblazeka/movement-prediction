@@ -36,6 +36,17 @@ class SUMO:
                     routes[child.attrib["id"]]=route.attrib['edges'].split(" ")
         self.routes = routes
 
+    def get_all_points(self):
+        """
+            Converts all routes to trajectories and returns all points in dataset
+        """
+        points = []
+        for _,route in self.routes.items():
+            trajectory = self.convert_nodearray_to_trajectory(self.convert_segments_to_nodes(route))
+            for point in trajectory:
+                points.append(point)
+        return points
+
     def convert_trajectory_to_nodearray(self,trajectory):
         """
             Convert a trajectory (array of [lat,lon]) to an array of nodes

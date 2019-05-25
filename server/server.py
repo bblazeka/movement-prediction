@@ -7,6 +7,8 @@ from flask.json import jsonify
 app = Flask(__name__)
 CORS(app)
 
+regression = Regression()
+
 @app.route('/')
 def hello():
     return 'Hello, World!'
@@ -16,8 +18,7 @@ def compare():
     # regression
     path = request.args.get('input', '')
     user = int(request.args.get('user', ''))
-    regression = Regression()
-    regression.prepare_data(path,user=user)
+    regression.prepare_sumo_data(path)
     regression.poly_regression()
     regression.formatting()
     # instance based learning

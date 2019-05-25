@@ -10,8 +10,8 @@ class Markov(BaseMethod):
 
     def __init__(self):
         self.sumo = SUMO()
-        self.sumo.parseElements("../data/sumo/osm_bbox.osm.xml")
-        self.sumo.parseRoutes("../data/sumo/osm.passenger.rou.xml")
+        self.sumo.parseElements("../data/zg/osm_bbox.osm.xml")
+        self.sumo.parseRoutes("../data/zg/osm.passenger.rou.xml")
         self.sumo.generate_markov()
 
 

@@ -12,11 +12,27 @@ from base import BaseMethod
 sys.path.append("./util")
 import taxi
 import geoutil
+import sumo
 
 class Regression(BaseMethod):
     def __init__(self):
         self.training = []
         self.query = ""
+
+        self.sumo = sumo.SUMO()
+        self.sumo.parseElements("../data/zg/osm_bbox.osm.xml")
+        self.sumo.parseRoutes("../data/zg/osm.passenger.rou.xml")
+
+    def prepare_sumo_data(self,query):
+        # check if input is a string, parse to an array
+        if type(query) is str:
+            query = geoutil.parseCoordinatesArray(query)
+        self.query = query
+        try:
+            self.training = self.sumo.get_all_points()[:10000]
+        except Exception as e:
+            print("No paths found: "+str(e))
+            return [],query
 
     def prepare_data(self,query,user=0,daytype="A"):
         """
