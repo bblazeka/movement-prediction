@@ -20,16 +20,20 @@ class Regression(BaseMethod):
         self.query = ""
 
         self.sumo = sumo.SUMO()
-        self.sumo.parseElements("../data/zg/osm_bbox.osm.xml")
-        self.sumo.parseRoutes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
+        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
 
     def prepare_sumo_data(self,query):
+        """
+            prepares the training data from sumo format
+        """
         # check if input is a string, parse to an array
         if type(query) is str:
-            query = geoutil.parseCoordinatesArray(query)
+            query = geoutil.parse_coords_array(query)
         self.query = query
         try:
-            self.training = self.sumo.get_all_points()[:10000]
+            self.training = self.sumo.get_all_points(query)
+            return self.training, self.query
         except Exception as e:
             print("No paths found: "+str(e))
             return [],query
@@ -38,10 +42,9 @@ class Regression(BaseMethod):
         """
             Prepares the data for regression
         """
-        
         # check if input is a string, parse to an array
         if type(query) is str:
-            query = geoutil.parseCoordinatesArray(query)
+            query = geoutil.parse_coords_array(query)
         
         # load data
         if user == 0:
@@ -60,7 +63,7 @@ class Regression(BaseMethod):
             points = taxi.pointsListConverter(data[x][8])
             if data[x][6]==daytype and len(points)>min_length:
                 # convert data to array of tuples of float values
-                geopoints = geoutil.convertPoints(points)
+                geopoints = geoutil.convert_points(points)
                 if taxi.containing(geopoints,query):
                     paths.append(geopoints)
 
@@ -203,7 +206,9 @@ class Regression(BaseMethod):
 
 def main():
     # not used in this application
-    print(regress("41.148,-8.585,41.148,-8.585,41.148,-8.585,41.148,-8.585","A"))
+    path = "[[15.9533,45.7944],[15.9554,45.7944],[15.9582,45.7943],[15.9590,45.7952],[15.9599,45.7960],[15.9602,45.7972],[15.9609,45.7979],[15.9618,45.7984],[15.9621,45.7991],[15.9636,45.7995],[15.9654,45.7995],[15.9667,45.7996],[15.9679,45.7996],[15.9693,45.7995],[15.9689,45.8007]]"
+    regression = Regression()
+    regression.prepare_sumo_data(path)
 
 if __name__ == '__main__':
     main()

@@ -8,7 +8,7 @@ import geoutil
 
 class Evaluation:
     def __init__(self,path):
-        self.input_path = geoutil.parseCoordinatesArray(path)
+        self.input_path = geoutil.parse_coords_array(path)
         self.regression = Regression()
         self.ibl = instance.Instance()
         self.hmm = markov.Markov()

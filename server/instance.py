@@ -11,8 +11,8 @@ class Instance(BaseMethod):
     
     def __init__(self):
         self.sumo = sumo.SUMO()
-        self.sumo.parseElements("../data/zg/osm_bbox.osm.xml")
-        self.sumo.parseRoutes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
+        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
 
     def get_similar(self,trajectory):
         """

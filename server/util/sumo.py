@@ -1,7 +1,8 @@
 import os
 from collections import defaultdict
 import xml.etree.ElementTree as ET
-from geoutil import distance
+from geoutil import distance, calculate_hausdorff
+from util import contains_any_element
 
 class SUMO:
 
@@ -10,7 +11,7 @@ class SUMO:
         self.ways = []
         self.routes = []
 
-    def parseElements(self,path):
+    def parse_elements(self,path):
         tree = ET.parse(path)
         root = tree.getroot()
         elements = defaultdict(list)
@@ -26,7 +27,7 @@ class SUMO:
         self.elements = elements
         self.ways = ways
 
-    def parseRoutes(self,path):
+    def parse_routes(self,path):
         tree = ET.parse(path)
         root = tree.getroot()
         routes = defaultdict(list)
@@ -36,15 +37,18 @@ class SUMO:
                     routes[child.attrib["id"]]=route.attrib['edges'].split(" ")
         self.routes = routes
 
-    def get_all_points(self):
+    def get_all_points(self,query):
         """
             Converts all routes to trajectories and returns all points in dataset
         """
         points = []
+        query_nodes = self.convert_trajectory_to_nodearray(query)
         for _,route in self.routes.items():
-            trajectory = self.convert_nodearray_to_trajectory(self.convert_segments_to_nodes(route))
-            for point in trajectory:
-                points.append(point)
+            route_nodes = self.convert_segments_to_nodes(route)
+            if contains_any_element(query_nodes,route_nodes):
+                trajectory = self.convert_nodearray_to_trajectory(route_nodes)
+                for point in trajectory:
+                    points.append(point)
         return points
 
     def convert_trajectory_to_nodearray(self,trajectory):
@@ -72,7 +76,7 @@ class SUMO:
         """
         nodes = []
         for segment in way_segments:
-            element = self.getNodeFromWay(segment)
+            element = self.node_from_way(segment)
             if(isinstance(element,str)):
                 nodes.append(element)
             else:
@@ -100,10 +104,10 @@ class SUMO:
                 nodes.append(self.elements[node])
         return nodes
 
-    def getLatLonFromNode(self,code):
+    def coords_from_node(self,code):
         return [self.elements[code]]
 
-    def getNodeFromWay(self,code):
+    def node_from_way(self,code):
         """
             if we have node identified as [way_id]#[way_position], it returns node_id
         """
@@ -142,11 +146,11 @@ class SUMO:
         # iterate over all routes, count visits and transitions in training
         for _,route in self.routes.items():
             for current, next in zip(route[:-1], route[1:]):
-                start = self.getNodeFromWay(current)
-                end = self.getNodeFromWay(next)
+                start = self.node_from_way(current)
+                end = self.node_from_way(next)
                 if(type(start)!=list and type(end)!=list):
-                    visits[self.getNodeFromWay(current)]+=1
-                    transitions[self.getNodeFromWay(current),self.getNodeFromWay(next)]+=1
+                    visits[self.node_from_way(current)]+=1
+                    transitions[self.node_from_way(current),self.node_from_way(next)]+=1
 
         # calculate all probabilities
         for transition,count in transitions.items():
@@ -191,8 +195,8 @@ class SUMO:
 def main():
     # test method
     sumo = SUMO()
-    sumo.parseElements("../../data/sumo/osm_bbox.osm.xml")
-    sumo.parseRoutes("../../data/sumo/osm.passenger.rou.xml")
+    sumo.parse_elements("../../data/sumo/osm_bbox.osm.xml")
+    sumo.parse_routes("../../data/sumo/osm.passenger.rou.xml")
     sumo.generate_markov()
 
 if __name__ == '__main__':

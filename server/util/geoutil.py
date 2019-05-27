@@ -3,7 +3,7 @@ from haversine import haversine
 from datetime import datetime, timedelta
 from MDAnalysis.analysis.psa import hausdorff
 
-def convertPoints(points):
+def convert_points(points):
     """
         Converts an array from string to float coordinates
     """
@@ -15,14 +15,14 @@ def convertPoints(points):
         geo_points.append([lat,long])
     return geo_points
 
-def parseCoordinatesArray(array):
+def parse_coords_array(array):
     """
         Convert array in string representation to an actual array of coordinates
     """
     coordinates = []
     for coor in array[2:-2].split("],["):
         coordinates.append(coor)
-    return convertPoints(coordinates)
+    return convert_points(coordinates)
 
 def calculate_hausdorff(A,B):
     """

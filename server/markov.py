@@ -10,8 +10,8 @@ class Markov(BaseMethod):
 
     def __init__(self):
         self.sumo = SUMO()
-        self.sumo.parseElements("../data/zg/osm_bbox.osm.xml")
-        self.sumo.parseRoutes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
+        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
         self.sumo.generate_markov()
 
 
@@ -20,10 +20,10 @@ class Markov(BaseMethod):
         if (isinstance(input,numpy.ndarray)):
             state = self.sumo.get_closest_node(input[-1])
         else:
-            state = self.sumo.get_closest_node(geoutil.parseCoordinatesArray(input)[-1])
+            state = self.sumo.get_closest_node(geoutil.parse_coords_array(input)[-1])
         prevStates = [state]
 
-        trajectory = self.sumo.getLatLonFromNode(state)
+        trajectory = self.sumo.coords_from_node(state)
         while(True):
             max = 0
             nextState = ''
@@ -40,7 +40,7 @@ class Markov(BaseMethod):
             else:
                 prevStates.append(state)
                 state = nextState
-            trajectory += self.sumo.getLatLonFromNode(state)
+            trajectory += self.sumo.coords_from_node(state)
 
         self.predicted = trajectory
         return formatting(trajectory)
