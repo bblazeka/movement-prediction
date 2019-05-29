@@ -13,7 +13,7 @@ class Evaluation:
         self.ibl = instance.Instance()
         self.hmm = markov.Markov()
     
-    def get_evaluations(self,radius=1):
+    def get_evaluations(self,radius=0.5):
         """
             Returns evaluations in certain area
         """
@@ -33,7 +33,7 @@ class Evaluation:
                 ibl_dist.append(geoutil.calculate_hausdorff(path,ibl_filtered))
                 hmm_dist.append(geoutil.calculate_hausdorff(path,hmm_filtered))
             # regression
-            self.regression.prepare_data(path)
+            self.regression.prepare_sumo_data(path)
             self.regression.poly_regression()
             self.regression.formatting()
             # instance based learning

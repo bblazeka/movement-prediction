@@ -3,6 +3,27 @@ from haversine import haversine
 from datetime import datetime, timedelta
 from MDAnalysis.analysis.psa import hausdorff
 
+def filter_by_latitude(trajectory,point,epsilon=0.03):
+    """
+        Filter trajectory only for some latitudes
+    """
+    filtered_points = []
+    for coords in trajectory:
+        if coords[1]-epsilon<point[1] and coords[1]+epsilon>point[1]:
+            filtered_points.append(coords)
+    return filtered_points
+
+def filter_by_longitude(trajectory,point,epsilon=0.005):
+    """
+        Filter trajectory only for some longitudes
+    """
+    filtered_points = []
+    for coords in trajectory:
+        if coords[0]-epsilon<point[0] and coords[0]+epsilon>point[0]:
+            filtered_points.append(coords)
+    return filtered_points
+
+
 def convert_points(points):
     """
         Converts an array from string to float coordinates

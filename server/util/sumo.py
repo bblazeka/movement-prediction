@@ -37,7 +37,7 @@ class SUMO:
                     routes[child.attrib["id"]]=route.attrib['edges'].split(" ")
         self.routes = routes
 
-    def get_all_points(self,query):
+    def get_all_relevant_points(self,query):
         """
             Converts all routes to trajectories and returns all points in dataset
         """

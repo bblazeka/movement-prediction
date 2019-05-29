@@ -77,7 +77,7 @@ class MapInterface extends Component {
       if (i > 5) {
         window.clearInterval(interval)
       }
-    }, 5000);
+    }, 10000);
   }
 
   componentWillReceiveProps(nextProps) {

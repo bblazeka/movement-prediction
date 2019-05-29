@@ -32,7 +32,7 @@ class Regression(BaseMethod):
             query = geoutil.parse_coords_array(query)
         self.query = query
         try:
-            self.training = self.sumo.get_all_points(query)
+            self.training = self.sumo.get_all_relevant_points(query)
             return self.training, self.query
         except Exception as e:
             print("No paths found: "+str(e))
@@ -97,7 +97,7 @@ class Regression(BaseMethod):
 
     def poly_regression(self,precision=8):
         """
-            Implementation of polynomal regression
+            Calculates polynomal regression variant suitable for needs of our prediction algorithm
         """
         # return empty lists if input is empty
         if self.training == []:
@@ -119,7 +119,7 @@ class Regression(BaseMethod):
         poly = PolynomialFeatures(precision)
 
         
-        # north-south regression
+        # regression with latitude as domain
         vertical_predicted_path = []
         transform = poly.fit_transform(longDf)
 
@@ -130,7 +130,7 @@ class Regression(BaseMethod):
             vertical_predicted_path.append([predictions[i][0],longDf["longitudes"][i]])
 
         
-        # west-east regression
+        # regression with longitude domain
         horizontal_predicted_path = []
         transform = poly.fit_transform(latDf)
 
@@ -163,18 +163,8 @@ class Regression(BaseMethod):
         last_point = regres[-1]
 
         # path manipulation (filtering, road matching and so on)
-        h_subpath = []
-        v_subpath = []
-        # filter to show only the points within 2 km
-        try:
-            for hcoor in self.horizontal:
-                if geoutil.distance(trajectory[-1],hcoor)<2:
-                    h_subpath.append(hcoor)
-            for vcoor in self.vertical:
-                if geoutil.distance(trajectory[-1],vcoor)<2:
-                    v_subpath.append(vcoor)
-        except AttributeError as ae:
-            pass
+        h_subpath = geoutil.filter_by_longitude(self.horizontal,trajectory[-1],0.005)
+        v_subpath = geoutil.filter_by_latitude(self.vertical,trajectory[-1],0.0005)
 
         # calculate direction vector prediction
         predicted_path = []
@@ -205,10 +195,12 @@ class Regression(BaseMethod):
         }
 
 def main():
-    # not used in this application
+    # test only
     path = "[[15.9533,45.7944],[15.9554,45.7944],[15.9582,45.7943],[15.9590,45.7952],[15.9599,45.7960],[15.9602,45.7972],[15.9609,45.7979],[15.9618,45.7984],[15.9621,45.7991],[15.9636,45.7995],[15.9654,45.7995],[15.9667,45.7996],[15.9679,45.7996],[15.9693,45.7995],[15.9689,45.8007]]"
     regression = Regression()
     regression.prepare_sumo_data(path)
+    regression.poly_regression()
+    regression.formatting()
 
 if __name__ == '__main__':
     main()
