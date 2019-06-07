@@ -28,13 +28,18 @@ class SUMO:
         self.ways = ways
 
     def parse_routes(self,path):
+        """
+            Parses the routes in XML and converts them from "way segment" format to a node_id format
+        """
         tree = ET.parse(path)
         root = tree.getroot()
         routes = defaultdict(list)
+        i = 0
         for child in root:
             if(child.tag == "vehicle"):
                 for route in child.iter('route'):
-                    routes[child.attrib["id"]]=route.attrib['edges'].split(" ")
+                    routes[i]=self.convert_segments_to_nodes(route.attrib['edges'].split(" "))
+                    i+=1
         self.routes = routes
 
     def get_all_relevant_points(self,query):
@@ -44,9 +49,8 @@ class SUMO:
         points = []
         query_nodes = self.convert_trajectory_to_nodearray(query)
         for _,route in self.routes.items():
-            route_nodes = self.convert_segments_to_nodes(route)
-            if contains_any_element(query_nodes,route_nodes):
-                trajectory = self.convert_nodearray_to_trajectory(route_nodes)
+            if contains_any_element(query_nodes,route):
+                trajectory = self.convert_nodearray_to_trajectory(route)
                 for point in trajectory:
                     points.append(point)
         return points
@@ -109,7 +113,7 @@ class SUMO:
 
     def node_from_way(self,code):
         """
-            if we have node identified as [way_id]#[way_position], it returns node_id
+            converts a node identified as [way_id]#[way_position] to node_id format
         """
         scrapped = code.replace("-","").split("#")
         if len(scrapped) > 1:
@@ -119,7 +123,7 @@ class SUMO:
 
     def get_closest_node(self,point):
         """
-            Returns the closest node id to a specific [lon,lat] pair
+            Returns the closest node_id to a specific [lon,lat] pair
         """
         min_distance = 1000
         closest_key = ""
@@ -136,6 +140,9 @@ class SUMO:
         return closest_key
 
     def generate_markov(self):
+        """
+            generates a Markov model for a current SUMO context (existing routes)
+        """
         # count of transitions between states
         transitions = defaultdict(int)
         # count of total visits of each state
@@ -146,11 +153,8 @@ class SUMO:
         # iterate over all routes, count visits and transitions in training
         for _,route in self.routes.items():
             for current, next in zip(route[:-1], route[1:]):
-                start = self.node_from_way(current)
-                end = self.node_from_way(next)
-                if(type(start)!=list and type(end)!=list):
-                    visits[self.node_from_way(current)]+=1
-                    transitions[self.node_from_way(current),self.node_from_way(next)]+=1
+                visits[current]+=1
+                transitions[current,next]+=1
 
         # calculate all probabilities
         for transition,count in transitions.items():
@@ -166,9 +170,8 @@ class SUMO:
         max_length = 0
         best_route = []
         for _,route in self.routes.items():
-            normal_route = self.convert_segments_to_nodes(route)
             m = len(trajectory) 
-            n = len(normal_route) 
+            n = len(route) 
         
             # declaring the array for storing the dp values 
             L = [[None]*(n + 1) for _ in range(m + 1)] 
@@ -180,7 +183,7 @@ class SUMO:
                 for j in range(n + 1): 
                     if i == 0 or j == 0 : 
                         L[i][j] = 0
-                    elif trajectory[i-1] == normal_route[j-1]: 
+                    elif trajectory[i-1] == route[j-1]: 
                         L[i][j] = L[i-1][j-1]+1
                     else: 
                         L[i][j] = max(L[i-1][j], L[i][j-1]) 
@@ -188,7 +191,7 @@ class SUMO:
             # L[m][n] contains the length of LCS of X[0..n-1] & Y[0..m-1] 
             if L[m][n] > max_length:
                 max_length = L[m][n]
-                best_route = normal_route
+                best_route = route
 
         return best_route
 

@@ -41,9 +41,9 @@ def evaluate():
 def path():
     path = request.args.get('input', '')
     user = int(request.args.get('user', ''))
-    regression = Regression()
-    regression.prepare_data(path,user=user)
+    regression.prepare_sumo_data(path)
     regression.poly_regression()
+    regression.formatting()
     return jsonify(regression.formatting())
 
 @app.route('/api/ibl', methods=['GET'])

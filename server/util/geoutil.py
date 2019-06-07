@@ -2,6 +2,7 @@ from mapbox import Directions, MapMatcher
 from haversine import haversine
 from datetime import datetime, timedelta
 from MDAnalysis.analysis.psa import hausdorff
+import numpy as np
 
 def filter_by_latitude(trajectory,point,epsilon=0.03):
     """
@@ -52,7 +53,10 @@ def calculate_hausdorff(A,B):
     if len(A) == 0 or len(B) == 0:
         return 1000.0
     else:
-        return hausdorff(A,B)
+        try:
+            return hausdorff(A,B)
+        except:
+            return hausdorff(np.array(A),np.array(B))
 
 def geojson_path_converter(path,title):
     """

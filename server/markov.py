@@ -1,6 +1,8 @@
 import sys, os
 import numpy
+import pandas as pd
 from base import BaseMethod
+import clustering
 sys.path.append(os.path.join(os.path.dirname(__file__), "./util"))
 import geoutil
 import taxi
@@ -14,6 +16,13 @@ class Markov(BaseMethod):
         self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
         self.sumo.generate_markov()
 
+    def training(self):
+        destinations = []
+        i = 0
+        for _,route in self.sumo.routes.items():
+            destinations.append(self.sumo.convert_node_to_coordinate(route[-1]))
+        destination_data = pd.DataFrame(destinations,columns=['lat','lon'])
+        clustering.clustering_by_location(destination_data)
 
     def predict(self,input):
         # set the last point of trajectory to be the initial point of prediction
@@ -53,7 +62,7 @@ def formatting(path):
 def main():
     # test method
     markov = Markov()
-    print(markov.predict("4610600"))
+    markov.training()
 
 if __name__ == '__main__':
     main()

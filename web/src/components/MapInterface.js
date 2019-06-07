@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
 import Switch from '@material-ui/core/Switch';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -17,6 +18,7 @@ class MapInterface extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      method: 'compare',
       maroon: {
         title: '',
         visible: false,
@@ -61,7 +63,7 @@ class MapInterface extends Component {
       })
     }
     // currently disabled personalized prediction: change 0 and 4
-    that.props.getPrediction('compare', 0, JSON.stringify(path).replace(/['"]+/g, ''))
+    that.props.getPrediction(this.state.method, 0, JSON.stringify(path).replace(/['"]+/g, ''))
   }
 
   componentDidMount() {
@@ -168,8 +170,8 @@ class MapInterface extends Component {
     let path = []
     that = this
     map.on("click", function (e) {
-      let lng = e.lngLat.lng.toFixed(4);
-      let lat = e.lngLat.lat.toFixed(4);
+      let lng = e.lngLat.lng.toFixed(5);
+      let lat = e.lngLat.lat.toFixed(5);
       path.push([lng, lat])
       if (path.length > 3) {
         that.request(that, path)
@@ -181,6 +183,10 @@ class MapInterface extends Component {
   }
 
   renderButtons() {
+    let options = []
+  }
+
+  renderControls() {
     let controls = [];
     utils.toggleableLayers.forEach((value) => {
       controls.push(
@@ -204,9 +210,37 @@ class MapInterface extends Component {
   render() {
     return (
       <div>
+        <div>
+          <Button
+            color={this.state.method === 'compare' ? 'primary' : 'secondary'}
+            onClick={() => this.setState({method: 'compare'})}
+          >
+            Compare
+          </Button>
+          <Button
+            color={this.state.method === 'regression' ? 'primary' : 'secondary'}
+            onClick={() => this.setState({method: 'regression'})}
+          >
+            Regression
+          </Button>
+          <Button
+            disabled
+            color={this.state.method === 'instance' ? 'primary' : 'secondary'}
+            onClick={() => this.setState({method: 'instance'})}
+          >
+            Instance
+          </Button>
+          <Button
+            disabled
+            color={this.state.method === 'markov' ? 'primary' : 'secondary'}
+            onClick={() => this.setState({method: 'markov'})}
+          >
+            Markov
+          </Button>
+        </div>
         <div ref={el => this.mapContainer = el} className="map" />
         <FormGroup row>
-          {this.renderButtons()}
+          {this.renderControls()}
         </FormGroup>
       </div>
 

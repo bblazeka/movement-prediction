@@ -10,7 +10,6 @@ export function* watcherSaga() {
   
   // function that makes the api request and returns a Promise for response
   function sendRequest(params) {
-      console.log(params)
     return axios({
       method: "get",
       url: "http://localhost:5000/api/"+params.path+"?user="+params.user+"&input="+params.query,
