@@ -164,5 +164,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Project specific folder containing data
-data/
+data/PortoTaxi
+data/porto
 cache/
