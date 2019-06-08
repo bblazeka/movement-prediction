@@ -133,7 +133,7 @@ class SUMO:
                 try:
                     condition = self.visits[key] > 2
                 except AttributeError:
-                    condition = True
+                    condition = False
                 if condition:
                     closest_key = key
                     min_distance = temp_distance
@@ -193,6 +193,7 @@ class SUMO:
                 max_length = L[m][n]
                 best_route = route
 
+        print(max_length)
         return best_route
 
 def main():

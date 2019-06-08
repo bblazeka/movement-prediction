@@ -13,6 +13,7 @@ flask = "*"
 virtualenv = "*"
 flask-cors = "*"
 jupyter = "*"
+haversine = "*"
 
 [dev-packages]
 

@@ -17,11 +17,14 @@ import sumo
 class Regression(BaseMethod):
     def __init__(self):
         self.training = []
+        self.horizontal = []
+        self.vertical = []
         self.query = ""
 
         self.sumo = sumo.SUMO()
         self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
         self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.generate_markov()
 
     def prepare_sumo_data(self,query):
         """

@@ -13,17 +13,17 @@ class Instance(BaseMethod):
         self.sumo = sumo.SUMO()
         self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
         self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.generate_markov()
 
     def get_similar(self,trajectory):
         """
             returns a route that is most similar
         """
-        trajectoryA = taxi.ndarrayConverter(taxi.pointsListConverter(trajectory))
-        node_array = self.sumo.convert_trajectory_to_nodearray(trajectoryA)
+        node_array = self.sumo.convert_trajectory_to_nodearray(taxi.ndarrayConverter(taxi.pointsListConverter(trajectory)))
         self.predicted = self.sumo.convert_nodearray_to_trajectory(self.sumo.longest_common_subsequence(node_array))
         return self.predicted
 
-    def formatting(path):
+    def formatting(self,path):
         return {
             "blue": geoutil.geojson_path_converter(path,"instance_based_learning")
         }

@@ -1,7 +1,6 @@
 import pandas as pd
 import csv
 import math
-from pymongo import MongoClient
 import numpy
 
 folder = "../data/PortoTaxi/train.csv"
@@ -33,19 +32,6 @@ def loadCsv():
         if(i>1000):
             break
     return dataset
-
-def loadMongo():
-    """
-        Read data from mongo database into a dataset
-    """
-    client = MongoClient("127.0.0.1:27017")
-    db=client.movementprediction
-    collection=db['things']
-    cursor=collection.find({})
-    for document in cursor:
-        print(document)
-    # currently, it only prints all documents, it should be converted to returning an array
-    # or csv loader should return json
 
 def loadRelated(id):
     """
@@ -96,7 +82,7 @@ def ndarrayConverter(data):
     for point in data:
         try:
             ndarraylist.append([float(point.split(",")[0]),float(point.split(",")[1])])
-        except Exception as e:
+        except:
             # parsing error, probably is the list empty
             pass
     return numpy.array(ndarraylist)
@@ -127,15 +113,6 @@ def starting(points,query,precision=0.001):
             break
         return True
     return False
-
-def calculate_hausdorff(A,B):
-    """
-        Returns hausdorff distance or 1000 if input is empty
-    """
-    if len(A) == 0 or len(B) == 0:
-        return 1000.0
-    else:
-        return hausdorff(A,B)
 
 def generate():
     """
@@ -177,4 +154,4 @@ def generate():
 
 
 if __name__ == '__main__':
-    mongo = loadMongo()
+    pass
