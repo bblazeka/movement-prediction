@@ -56,6 +56,10 @@ def ibl():
     return jsonify(instance.get_similar(path))
 
 @app.route('/api/markov', methods=['GET'])
-def markovModel():
+def markov_model():
     path = request.args.get('input', '')
     return jsonify(markov.predict("4610600"))
+
+@app.route('/api/tests', methods=['GET'])
+def tests():
+    return jsonify(eval.get_geojson_tests())

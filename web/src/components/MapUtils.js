@@ -1,3 +1,4 @@
+export const requestTypes = ['compare', 'regression', 'instance', 'markov', 'tests'];
 export const toggleableLayers = ['red', 'blue', 'black', 'orange', 'maroon'];
 export const token = 'pk.eyJ1IjoiYnJhbmNhIiwiYSI6ImNqcWprdnNodzA0aDMzeHMxZndrYnhucDgifQ.jUE6YbihyEe0kvTfbvD6iw';
 

@@ -183,7 +183,19 @@ class MapInterface extends Component {
   }
 
   renderButtons() {
-    let options = []
+    let controls = [];
+    utils.requestTypes.forEach((value)=>{
+      controls.push(
+        <Button
+        key={'button-' + value}
+        color={this.state.method === value ? 'primary' : 'secondary'}
+        onClick={() => this.setState({method: value})}
+      >
+        {value}
+      </Button>
+      )
+    })
+    return controls;
   }
 
   renderControls() {
@@ -211,32 +223,7 @@ class MapInterface extends Component {
     return (
       <div>
         <div>
-          <Button
-            color={this.state.method === 'compare' ? 'primary' : 'secondary'}
-            onClick={() => this.setState({method: 'compare'})}
-          >
-            Compare
-          </Button>
-          <Button
-            color={this.state.method === 'regression' ? 'primary' : 'secondary'}
-            onClick={() => this.setState({method: 'regression'})}
-          >
-            Regression
-          </Button>
-          <Button
-            disabled
-            color={this.state.method === 'instance' ? 'primary' : 'secondary'}
-            onClick={() => this.setState({method: 'instance'})}
-          >
-            Instance
-          </Button>
-          <Button
-            disabled
-            color={this.state.method === 'markov' ? 'primary' : 'secondary'}
-            onClick={() => this.setState({method: 'markov'})}
-          >
-            Markov
-          </Button>
+          {this.renderButtons()}
         </div>
         <div ref={el => this.mapContainer = el} className="map" />
         <FormGroup row>

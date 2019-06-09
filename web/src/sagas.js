@@ -23,7 +23,7 @@ export function* watcherSaga() {
       const response = yield call(sendRequest,params.payload);
       console.log(response)
   
-      // dispatch a success action to the store with the new dog
+      // dispatch a success action to the store with the payload
       if (params.payload.user === 0) {
         yield put({ type: actions.GENERAL_PREDICTION_LOADED, payload: response.data });
       } else {
