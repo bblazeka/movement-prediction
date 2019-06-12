@@ -11,6 +11,7 @@ class Evaluation:
         self.regression = Regression()
         self.ibl = instance.Instance()
         self.hmm = markov.Markov()
+        self.hmm.training()
     
     def get_evaluations(self,radius=0.5):
         """
@@ -43,7 +44,8 @@ class Evaluation:
                 # instance based learning
                 self.ibl.get_similar(path)
                 # markov
-                self.hmm.predict(path)
+                cluster = self.hmm.cluster_probabilities(path)
+                self.hmm.predict(path,cluster)
                 reg_full = reg_full + self.regression.get_predict()
 
             evaluations.append(

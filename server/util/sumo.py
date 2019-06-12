@@ -193,7 +193,6 @@ class SUMO:
                 max_length = L[m][n]
                 best_route = route
 
-        print(max_length)
         return best_route
 
 def main():
