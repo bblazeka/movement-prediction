@@ -3,6 +3,9 @@ import mapboxgl from 'mapbox-gl';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Switch from '@material-ui/core/Switch';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import NavigationIcon from '@material-ui/icons/Navigation';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
@@ -18,6 +21,7 @@ class MapInterface extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      dataset: 'zg',
       method: 'compare',
       maroon: {
         title: '',
@@ -62,15 +66,22 @@ class MapInterface extends Component {
         })
       })
     }
-    // currently disabled personalized prediction: change 0 and 4
-    that.props.getPrediction(this.state.method, 0, JSON.stringify(path).replace(/['"]+/g, ''))
+    that.props.getPrediction(this.state.method, this.state.dataset, JSON.stringify(path).replace(/['"]+/g, ''))
   }
 
   componentDidMount() {
     this.loadMap();
+  }
+
+  recentre() {
+    let center = utils.cities.filter(x => x.value === this.state.dataset)[0].center;
+    this.map.jumpTo({'center': center, 'zoom': 12});
+  }
+
+  generate() {
     let i = 0;
     let that = this;
-    let path = utils.demoQuery();
+    let path = utils.cities.filter(x => x.value === this.state.dataset)[0].input[0];
     let interval = window.setInterval(function () {
       i++;
       const array = JSON.parse(path)
@@ -91,16 +102,21 @@ class MapInterface extends Component {
       red,
       maroon,
     } = nextProps.general;
-    // layer with prediction from instance based learning
-    map.getSource('blue').setData(blue);
-    // layer with training data
-    map.getSource('orange').setData(orange);
-    // layer with prediction from polynomial regression
-    map.getSource('black').setData(black);
-    // layer with linear regression of last few points of input data
-    map.getSource('red').setData(red);
-    // polynomial regression prediction with road matching applied
-    map.getSource('maroon').setData(maroon);
+    if (blue) {
+      map.getSource('blue').setData(blue);
+    }
+    if (orange) {
+      map.getSource('orange').setData(orange);
+    }
+    if (black) {
+      map.getSource('black').setData(black);
+    }
+    if (red) {
+      map.getSource('red').setData(red);
+    }
+    if (maroon) {
+      map.getSource('maroon').setData(maroon);
+    }
     this.setState({
       blue: {
         title: blue ? blue.properties.title : '',
@@ -182,22 +198,6 @@ class MapInterface extends Component {
     this.map = map;
   }
 
-  renderButtons() {
-    let controls = [];
-    utils.requestTypes.forEach((value)=>{
-      controls.push(
-        <Button
-        key={'button-' + value}
-        color={this.state.method === value ? 'primary' : 'secondary'}
-        onClick={() => this.setState({method: value})}
-      >
-        {value}
-      </Button>
-      )
-    })
-    return controls;
-  }
-
   renderControls() {
     let controls = [];
     utils.toggleableLayers.forEach((value) => {
@@ -223,7 +223,30 @@ class MapInterface extends Component {
     return (
       <div>
         <div>
-          {this.renderButtons()}
+          <Button aria-label="Generate" onClick={() => this.generate()}>
+            <NavigationIcon />
+            Generate
+          </Button>
+          <Select
+            value={this.state.method}
+            onChange={(event) => this.setState({method: event.target.value})}
+          >
+          {
+            utils.requestTypes.map((value) => {
+              return (<MenuItem value={value}>{value}</MenuItem>)
+            })
+          }
+          </Select>
+          <Select
+            value={this.state.dataset}
+            onChange={(event) => this.setState({dataset: event.target.value})}
+          >
+            <MenuItem value={"zg"}>Zagreb</MenuItem>
+            <MenuItem value={"porto"}>Porto</MenuItem>
+          </Select>
+          <Button onClick={() => this.recentre()}>
+            Recentre
+          </Button>
         </div>
         <div ref={el => this.mapContainer = el} className="map" />
         <FormGroup row>
@@ -237,7 +260,6 @@ class MapInterface extends Component {
 
 const mapStateToProps = state => ({
   general: state.app.general,
-  individual: state.app.individual
 })
 
 const mapDispatchToProps = dispatch => ({

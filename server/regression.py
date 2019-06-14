@@ -21,15 +21,14 @@ class Regression(BaseMethod):
         self.vertical = []
         self.query = ""
 
-        self.sumo = sumo.SUMO()
-        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
-        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
-        self.sumo.generate_markov()
-
     def prepare_sumo_data(self,query):
         """
             prepares the training data from sumo format
         """
+        self.sumo = sumo.SUMO()
+        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
+        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.generate_markov()
         # check if input is a string, parse to an array
         if type(query) is str:
             query = geoutil.parse_coords_array(query)
@@ -148,7 +147,16 @@ class Regression(BaseMethod):
         
         # return sorted horizontal and vertical prediction
         return self.horizontal, self.vertical
-            
+    
+    def train(self,path,mode):
+        """
+            Method for training polynomial regression
+        """
+        if mode == "porto":
+            self.prepare_data(path)
+        else:
+            self.prepare_sumo_data(path)
+        self.poly_regression()
 
     def formatting(self):
         """

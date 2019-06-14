@@ -9,13 +9,15 @@ import sumo
 
 class Instance(BaseMethod):
     
-    def __init__(self):
+    def __init__(self,mode):
         self.sumo = sumo.SUMO()
-        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
-        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.parse_elements("../data/"+mode+"/osm_bbox.osm.xml")
+        self.sumo.parse_routes("../data/"+mode+"/osm.passenger.rou.xml")
+
+    def train(self):
         self.sumo.generate_markov()
 
-    def get_similar(self,trajectory):
+    def predict(self,trajectory):
         """
             returns a route that is most similar
         """
@@ -23,10 +25,10 @@ class Instance(BaseMethod):
         self.predicted = self.sumo.convert_nodearray_to_trajectory(self.sumo.longest_common_subsequence(node_array))
         return self.predicted
 
-    def formatting(self,path):
-        return {
-            "blue": geoutil.geojson_path_converter(path,"instance_based_learning")
-        }
+def formatting(path):
+    return {
+        "blue": geoutil.geojson_path_converter(path,"instance_based_learning")
+    }
 
 def main():
     # test method

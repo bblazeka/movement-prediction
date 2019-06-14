@@ -17,49 +17,57 @@ def hello():
 def compare():
     # regression
     path = request.args.get('input', '')
-    user = int(request.args.get('user', ''))
-    regression.prepare_sumo_data(path)
-    regression.poly_regression()
+    mode = request.args.get('mode', '')
+    regression.train(path,mode)
     regression.formatting()
     # instance based learning
-    ibl = instance.Instance()
-    ibl.get_similar(path)
+    ibl = instance.Instance(mode)
+    ibl.predict(path)
     # markov
-    hmm = markov.Markov()
+    hmm = markov.Markov(mode)
+    hmm.train()
     hmm.predict(path)
     return jsonify(base.comparison(regression.get_predict(),ibl.get_predict(),hmm.get_predict()))
 
 @app.route('/api/evaluate', methods=['GET'])
 def evaluate():
-    path = request.args.get('input', '')
+    mode = request.args.get('mode', '')
     try:
         radius = int(request.args.get('radius', ''))
     except:
         print('Couldn\'t parse radius')
         radius = 1
-    evaluation = eval.Evaluation(path)
+    evaluation = eval.Evaluation(mode)
     evals = evaluation.get_evaluations(radius)
     return jsonify(evals)
 
 @app.route('/api/regression', methods=['GET'])
 def path():
     path = request.args.get('input', '')
-    user = int(request.args.get('user', ''))
-    regression.prepare_sumo_data(path)
-    regression.poly_regression()
+    mode = request.args.get('mode', '')
+    regression.train(path,mode)
     regression.formatting()
     return jsonify(regression.formatting())
 
-@app.route('/api/ibl', methods=['GET'])
+@app.route('/api/instance', methods=['GET'])
 def ibl():
     path = request.args.get('input', '')
-    return jsonify(instance.get_similar(path))
+    mode = request.args.get('mode', '')
+    ibl = instance.Instance(mode)
+    ibl.train()
+    ibl.predict(path)
+    return jsonify(instance.formatting(ibl.get_predict()))
 
 @app.route('/api/markov', methods=['GET'])
 def markov_model():
-    path = request.args.get('input', '')
-    return jsonify(markov.predict("4610600"))
+    input = request.args.get('input', '')
+    mode = request.args.get('mode', '')
+    hmm = markov.Markov(mode)
+    hmm.train()
+    hmm.predict(input)
+    return jsonify(markov.formatting(hmm.get_predict()))
 
 @app.route('/api/tests', methods=['GET'])
 def tests():
-    return jsonify(eval.get_geojson_tests())
+    mode = request.args.get('mode', '')
+    return jsonify(eval.get_geojson_tests(mode))

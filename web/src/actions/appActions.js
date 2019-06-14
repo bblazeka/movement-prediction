@@ -1,12 +1,11 @@
 export const PREDICT_PATH = 'PREDICT_PATH'
-export const GENERAL_PREDICTION_LOADED = 'GENERAL_PREDICTION_LOADED'
-export const INDIVIDUAL_PREDICTION_LOADED = 'INDIVIDUAL_PREDICTION_LOADED'
+export const PREDICTION_LOADED = 'PREDICTION_LOADED'
 
-export const predictedPath = (path,user,query) => ({
+export const predictedPath = (path,mode,query) => ({
   type: PREDICT_PATH,
   payload: {
     path,
-    user,
+    mode,
     query,
   }
 })

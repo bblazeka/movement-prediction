@@ -12,7 +12,7 @@ export function* watcherSaga() {
   function sendRequest(params) {
     return axios({
       method: "get",
-      url: "http://localhost:5000/api/"+params.path+"?user="+params.user+"&input="+params.query,
+      url: "http://localhost:5000/api/"+params.path+"?mode="+params.mode+"&input="+params.query,
       headers: {"Content-Type": "application/json"}
     });
   }
@@ -24,13 +24,9 @@ export function* watcherSaga() {
       console.log(response)
   
       // dispatch a success action to the store with the payload
-      if (params.payload.user === 0) {
-        yield put({ type: actions.GENERAL_PREDICTION_LOADED, payload: response.data });
-      } else {
-        yield put({ type: actions.INDIVIDUAL_PREDICTION_LOADED, payload: response.data });
+      if (response) {
+        yield put({ type: actions.PREDICTION_LOADED, payload: response.data });
       }
-      // 
-    
     } catch (error) {
       alert(error)
       // dispatch a failure action to the store with the error

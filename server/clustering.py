@@ -40,7 +40,7 @@ def clustering_by_location(coords):
     """
     kms_per_radian = 6371.0088
     # by setting epsilon, we set max distance that points can be from each other in a cluster
-    # 0.3 km in this example
+    # 0.2 km in this example
     epsilon = 0.2 / kms_per_radian
     db = DBSCAN(eps=epsilon, min_samples=1, algorithm='ball_tree', metric='haversine').fit(np.radians(coords))
     cluster_labels = db.labels_

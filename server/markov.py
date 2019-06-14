@@ -10,10 +10,10 @@ from sumo import SUMO
 
 class Markov(BaseMethod):
 
-    def __init__(self):
+    def __init__(self,mode):
         self.sumo = SUMO()
-        self.sumo.parse_elements("../data/zg/osm_bbox.osm.xml")
-        self.sumo.parse_routes("../data/zg/osm.passenger.rou.xml")
+        self.sumo.parse_elements("../data/"+mode+"/osm_bbox.osm.xml")
+        self.sumo.parse_routes("../data/"+mode+"/osm.passenger.rou.xml")
         self.sumo.generate_markov()
 
     def prob_l_c(self,l,c):
@@ -40,7 +40,7 @@ class Markov(BaseMethod):
         except:
             return 0
 
-    def training(self):
+    def train(self):
         """
             Training Markov through building link-cluster co-occurence matrix
         """
@@ -60,6 +60,9 @@ class Markov(BaseMethod):
                     self.matrix[cluster][point]=1
 
     def cluster_probabilities(self,input):
+        """
+            Calculates the probability of input belonging to a certain cluster
+        """
         if (isinstance(input,numpy.ndarray) == False):
             input = geoutil.parse_coords_array(input)
         n = len(self.matrix)
@@ -73,14 +76,21 @@ class Markov(BaseMethod):
                 probabilities[i] *= self.prob_l_c(node,i)
         return probabilities.index(max(probabilities))
         
-    def predict(self,input,cluster):
+    def predict(self,input):
+        """
+            Generates a prediction for given input
+        """
+        cluster = self.cluster_probabilities(input)
         # set the last point of trajectory to be the initial point of prediction
         if (isinstance(input,numpy.ndarray)):
-            state = self.sumo.get_closest_node(input[-1])
+            input_array = input
         else:
-            state = self.sumo.get_closest_node(geoutil.parse_coords_array(input)[-1])
-        prevStates = [state]
+            input_array = geoutil.parse_coords_array(input)
+        prevStates = []
+        for coor in input_array:
+            prevStates.append(self.sumo.get_closest_node(coor))
 
+        state = prevStates[-1]
         trajectory = self.sumo.coords_from_node(state)
         while(True):
             max = 0
@@ -88,7 +98,7 @@ class Markov(BaseMethod):
             # iterate over all transitions in the markov model
             for transition, probability in self.sumo.markov.items():
                 try:
-                    if state == transition[0] and self.matrix[cluster][transition[1]]>0:
+                    if state == transition[0] and self.matrix[cluster][transition[1]]>0 and not (transition[1] in prevStates):
                         if (probability > max):
                             max = probability
                             nextState = transition[1]
@@ -114,7 +124,7 @@ def formatting(path):
 def main():
     # test method
     markov = Markov()
-    markov.training()
+    markov.train()
     input = "[[15.95322,45.79300],[15.95324,45.79371],[15.95416,45.79425],[15.95608,45.79421],[15.95743,45.79420],[15.95850,45.79413],[15.95911,45.79455],[15.95939,45.79488],[15.95980,45.79579],[15.96042,45.79665],[15.96099,45.79747],[15.96150,45.79825],[15.96204,45.79905],[15.96301,45.79930],[15.96461,45.79935],[15.96594,45.79943]]"
     cluster = markov.cluster_probabilities(input)
     print(markov.predict(input,cluster))
