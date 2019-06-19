@@ -83,4 +83,5 @@ def get_geojson_tests(set):
         "black": geo_tests[0],
         "blue": geo_tests[1],
         "red": geo_tests[2],
+        "orange": geo_tests[3],
     }
