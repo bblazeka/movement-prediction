@@ -36,7 +36,7 @@ export const blueLayer = {
     'visibility': 'visible'
   },
   'paint': {
-    'circle-radius': 2,
+    'circle-radius': 4,
     'circle-color': 'rgba(55,148,179,1)'
   }
 }
@@ -49,7 +49,7 @@ export const blackLayer = {
     'visibility': 'visible'
   },
   'paint': {
-    'circle-radius': 2,
+    'circle-radius': 4,
     'circle-color': 'rgba(0,0,0,1)'
   }
 }
@@ -62,7 +62,7 @@ export const greenLayer = {
     'visibility': 'visible'
   },
   'paint': {
-    'circle-radius': 3,
+    'circle-radius': 4,
     'circle-color': 'rgba(0,100,0,1)'
   }
 }
@@ -75,7 +75,7 @@ export const redLayer = {
     'visibility': 'visible'
   },
   'paint': {
-    'circle-radius': 2,
+    'circle-radius': 4,
     'circle-color': 'rgba(255,0,0,1)'
   }
 }
@@ -88,7 +88,7 @@ export const orangeLayer = {
     'visibility': 'visible'
   },
   'paint': {
-    'circle-radius': 2,
+    'circle-radius': 4,
     'circle-color': 'rgba(255,165,0,1)'
   }
 }
@@ -101,7 +101,7 @@ export const maroonLayer = {
     'visibility': 'visible'
   },
   'paint': {
-    'circle-radius': 2,
+    'circle-radius': 4,
     'circle-color': 'rgba(128,0,0,1)'
   }
 }

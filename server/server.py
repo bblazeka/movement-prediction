@@ -22,6 +22,7 @@ def compare():
     regression.formatting()
     # instance based learning
     ibl = instance.Instance(mode)
+    ibl.train()
     ibl.predict(path)
     # markov
     hmm = markov.Markov(mode)

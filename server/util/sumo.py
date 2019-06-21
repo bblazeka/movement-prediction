@@ -7,9 +7,9 @@ from util import contains_any_element
 class SUMO:
 
     def __init__(self):
-        self.elements = []
-        self.ways = []
-        self.routes = []
+        self.elements = defaultdict(list)
+        self.ways = defaultdict(list)
+        self.routes = defaultdict(list)
 
     def parse_elements(self,path):
         tree = ET.parse(path)

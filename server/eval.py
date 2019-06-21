@@ -28,6 +28,7 @@ class Evaluation:
             input_patches = numpy.array_split(numpy.array(route),5)
             # specific case of comparsion for polynomial regression
             reg_full = []
+            hmm_full = []
             for i in range(len(input_patches)):
                 path = input_patches[i]
                 center = path[-1]
@@ -48,6 +49,7 @@ class Evaluation:
                 self.hmm.train()
                 self.hmm.predict(path)
                 reg_full = reg_full + self.regression.get_predict()
+                hmm_full = hmm_full + self.hmm.get_filtered_predict(center,radius)
 
             evaluations.append(
                 {
@@ -56,7 +58,7 @@ class Evaluation:
                     "instance": ibl_dist,
                     "instance_full": geoutil.calculate_hausdorff(self.ibl.get_predict(),route),
                     "markov": hmm_dist,
-                    "markov_full": geoutil.calculate_hausdorff(self.hmm.get_predict(),route)
+                    "markov_full": geoutil.calculate_hausdorff(hmm_full,route)
                 }
             )
 
