@@ -174,7 +174,7 @@ class Regression(BaseMethod):
         last_point = regres[-1]
 
         # path manipulation (filtering, road matching and so on)
-        h_subpath = geoutil.filter_by_longitude(self.horizontal,trajectory[-1],0.005)
+        h_subpath = geoutil.filter_by_longitude(self.horizontal,trajectory[-1],0.0005)
         v_subpath = geoutil.filter_by_latitude(self.vertical,trajectory[-1],0.0005)
 
         # calculate direction vector prediction
