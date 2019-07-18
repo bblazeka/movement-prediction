@@ -10,12 +10,12 @@ Detailed description to be added...
 
 # Running
 
-- database: MongoDB (run with: `sudo service mongod start`)
-
-- evaluation: jupyter notebook
-
 - run pipenv: pipenv shell
 
-- server: Flask (run with Linux: `FLASK_APP=server.py flask run`, Windows: `set FLASK_APP=server.py` + `flask run`)
+- in server folder: Flask (run with Linux: `FLASK_APP=server.py flask run`, Windows: `set FLASK_APP=server.py` + `flask run`)
 
-- web: React.js (run with: `npm start`)
+- in web folder: React.js (run with: `npm start`)
+
+- (optional) in evaluation folder: jupyter notebook
+
+Note: install requirements/dependencies if necessary
